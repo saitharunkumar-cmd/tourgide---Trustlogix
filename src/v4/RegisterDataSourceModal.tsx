@@ -287,7 +287,10 @@ export default function RegisterDataSourceModal() {
         </main>
       </div>
 
-      <footer className="relative z-20 flex shrink-0 items-center justify-between border-t border-tlx-border bg-white px-7 py-4">
+      <footer className={[
+        'relative flex shrink-0 items-center justify-between px-7 py-4',
+        selectVariant === 'v1' ? 'z-[5]' : 'z-20 border-t border-tlx-border bg-white',
+      ].join(' ')}>
         <button
           type="button"
           onClick={onPrevious}
@@ -313,7 +316,7 @@ export default function RegisterDataSourceModal() {
                 'inline-flex items-center gap-1.5 rounded-[5px] px-6 py-2 text-sm font-semibold transition-all duration-300',
                 connField === 'done'
                   ? 'bg-[#00A8CF] text-white shadow-sm hover:bg-[#66CAE3]' + (isV2 ? ' animate-ripple-ring' : '')
-                  : 'cursor-not-allowed bg-tlx-surface text-tlx-muted',
+                  : 'cursor-not-allowed bg-[#00A8CF] text-white opacity-40 shadow-none',
               ].join(' ')}
             >
               Save
