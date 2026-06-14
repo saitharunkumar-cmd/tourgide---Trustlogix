@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Surface */
+  --tlx-bg-canvas: #FCFCFF;
+  --tlx-bg-surface: #FFFFFF;
+  --tlx-bg-subtle: #FFFFFF;
+  --tlx-bg-muted: #FAFBFD;
+
+  /* Text */
+  --tlx-text-primary: #20293A;
+  --tlx-text-secondary: #617085;
+  --tlx-text-muted: #8A95A8;
+  --tlx-text-link: #00A8CF;
+  --tlx-text-critical: #E04953;
+  --tlx-text-high: #E04953;
+  --tlx-text-medium: #FF8F6B;
+  --tlx-text-low: #41B57F;
+
+  /* CTA */
+  --tlx-cta-primary: #00A8CF;
+  --tlx-cta-primary-text: #FFFFFF;
+  --tlx-cta-primary-disabled: #99DCED;
+  --tlx-cta-secondary-bg: #FFFFFF;
+  --tlx-cta-secondary-border: #617085;
+  --tlx-cta-secondary-text: #617085;
+  --tlx-cta-ghost-bg: #FFFFFF;
+  --tlx-cta-ghost-text: #617085;
+
+  /* Cards */
+  --tlx-card-bg: #FFFFFF;
+  --tlx-card-bg-active: #E9F8FB;
+  --tlx-card-border: #E4E7EB;
+  --tlx-card-text-primary: #20293A;
+  --tlx-card-text-secondary: #617085;
+  --tlx-card-icon-default: #B8BFC9;
+  --tlx-card-icon-active: #20293A;
+  --tlx-card-icon-bg: #FAFBFD;
+  --tlx-card-icon-bg-active: #CCEEF4;
+
+  /* Table */
+  --tlx-table-border: #E4E7EB;
+  --tlx-table-columns-bg: #FFFFFF;
+  --tlx-table-row-bg: #FAFBFD;
+  --tlx-table-side-border: #6B6B6B;
+
+  /* Menu */
+  --tlx-menu-bg: #FFFFFF;
+  --tlx-menu-bg-active: #E8F7FB;
+  --tlx-menu-icon-default: #617085;
+  --tlx-menu-border: #E4E7EB;
+
+  /* Input */
+  --tlx-input-bg: #FFFFFF;
+  --tlx-input-border: #2D3A50;
+  --tlx-input-text: #20293A;
+  --tlx-input-text-default: #20293A;
+  --tlx-input-floating-text: #617085;
+
+  /* Status */
+  --tlx-status-success: #41B57F;
+  --tlx-status-error: #E04953;
+  --tlx-status-warning: #FF8F6B;
+  --tlx-status-info: #08AAC5;
+  --tlx-status-neutral-bg: #FAFBFD;
+  --tlx-status-neutral-border: #E4E7EB;
+  --tlx-status-neutral-text: #617085;
+
+  /* Stroke */
+  --tlx-stroke-default: #E4E7EB;
+  --tlx-stroke-link: #00A8CF;
+
+  /* Icon */
+  --tlx-icon-default: #8A95A8;
+  --tlx-icon-active: #20293A;
+  --tlx-icon-link: #00A8CF;
+  --tlx-icon-error: #E04953;
+  --tlx-icon-disabled: #B8BFC9;
+
+  /* Shadows */
+  --tlx-shadow-sm: 0 10px 30px 0 #F4F6FA;
+  --tlx-shadow-md: 0 10px 40px 0 #E4E7EB;
+  --tlx-shadow-lg: 0 20px 30px 0 #DCDCDC;
+  --tlx-shadow-xl: 0 15px 50px 0 #E4E7EB;
+
+  /* Border radius */
+  --tlx-radius-xs: 3px;
+  --tlx-radius-sm: 5px;
+  --tlx-radius-md: 8px;
+  --tlx-radius-lg: 10px;
+  --tlx-radius-xl: 15px;
+
+  /* Logo */
+  --tlx-logo-bg: #01222A;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--tlx-text-primary);
+  background-color: var(--tlx-bg-canvas);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #B8BFC9;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8A95A8;
+}
