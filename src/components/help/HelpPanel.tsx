@@ -24,10 +24,12 @@ import {
 } from './helpIcons'
 
 export type HelpTab = 'help' | 'tour' | 'settings'
+export type HelpMode = 'popup' | 'drawer'
 
 type HelpPanelProps = {
   open: boolean
   onClose: () => void
+  mode?: HelpMode
 }
 
 const TRIGGER_SELECTOR = 'button[aria-label="Help and Guidance"]'
@@ -36,6 +38,7 @@ const MARGIN = 16
 const MIN_W = 340
 const MIN_H = 360
 const SIZE_KEY = 'tlx:help-panel-size'
+const DRAWER_WIDTH = 420
 
 type Size = { width: number; height: number }
 type Rect = { left: number; top: number; width: number; height: number }
@@ -104,7 +107,7 @@ function resizeRect(edge: Edge, start: Rect, dx: number, dy: number): Rect {
   return { left, top, width, height }
 }
 
-export default function HelpPanel({ open, onClose }: HelpPanelProps) {
+export default function HelpPanel({ open, onClose, mode = 'popup' }: HelpPanelProps) {
   const [mounted, setMounted] = useState(false)
   const [shown, setShown] = useState(false)
   const [resizing, setResizing] = useState(false)
@@ -117,21 +120,21 @@ export default function HelpPanel({ open, onClose }: HelpPanelProps) {
   useEffect(() => {
     if (open) {
       setMounted(true)
-      setLayout(computeLayout(sizeRef.current))
+      if (mode === 'popup') setLayout(computeLayout(sizeRef.current))
       const id = requestAnimationFrame(() => setShown(true))
       return () => cancelAnimationFrame(id)
     }
     setShown(false)
-    const t = setTimeout(() => setMounted(false), 220)
+    const t = setTimeout(() => setMounted(false), 300)
     return () => clearTimeout(t)
-  }, [open])
+  }, [open, mode])
 
   useEffect(() => {
-    if (!open) return
+    if (!open || mode !== 'popup') return
     const onResize = () => setLayout(computeLayout(sizeRef.current))
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
-  }, [open])
+  }, [open, mode])
 
   const onResizeDown = (edge: Edge) => (e: React.PointerEvent) => {
     if (!layout) return
@@ -172,23 +175,71 @@ export default function HelpPanel({ open, onClose }: HelpPanelProps) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
-    const onPointerDown = (e: PointerEvent) => {
-      const target = e.target as Node
-      if (cardRef.current?.contains(target)) return
-      if ((target as Element).closest?.(TRIGGER_SELECTOR)) return
-      onClose()
-    }
     window.addEventListener('keydown', onKey)
-    document.addEventListener('pointerdown', onPointerDown, true)
+    let cleanupPointer = () => {}
+    if (mode === 'popup') {
+      const onPointerDown = (e: PointerEvent) => {
+        const target = e.target as Node
+        if (cardRef.current?.contains(target)) return
+        if ((target as Element).closest?.(TRIGGER_SELECTOR)) return
+        onClose()
+      }
+      document.addEventListener('pointerdown', onPointerDown, true)
+      cleanupPointer = () => document.removeEventListener('pointerdown', onPointerDown, true)
+    }
     const focusId = requestAnimationFrame(() => cardRef.current?.focus())
     return () => {
       window.removeEventListener('keydown', onKey)
-      document.removeEventListener('pointerdown', onPointerDown, true)
+      cleanupPointer()
       cancelAnimationFrame(focusId)
     }
-  }, [open, onClose])
+  }, [open, onClose, mode])
 
-  if (!mounted || !layout) return videoOpen ? <FloatingVideoPlayer onClose={() => setVideoOpen(false)} /> : null
+  if (!mounted) return videoOpen ? <FloatingVideoPlayer onClose={() => setVideoOpen(false)} /> : null
+
+  // Drawer mode — slides in from the right with a backdrop
+  if (mode === 'drawer') {
+    return (
+      <>
+        {videoOpen && <FloatingVideoPlayer onClose={() => setVideoOpen(false)} />}
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 10099 }}
+          className={[
+            'bg-black/20 transition-opacity duration-300',
+            shown ? 'opacity-100' : 'opacity-0',
+          ].join(' ')}
+          onClick={onClose}
+          aria-hidden="true"
+        />
+        <div
+          ref={cardRef}
+          role="dialog"
+          aria-label="Help and Guidance"
+          tabIndex={-1}
+          style={{
+            position: 'fixed',
+            right: 0,
+            top: 0,
+            width: DRAWER_WIDTH,
+            maxWidth: '100vw',
+            height: '100vh',
+            zIndex: 10100,
+          }}
+          className={[
+            'flex flex-col overflow-hidden border-l border-tlx-border bg-white',
+            'shadow-[-8px_0_24px_-4px_rgba(32,41,58,0.12)]',
+            'transition-transform duration-300 ease-out motion-reduce:transition-none',
+            shown ? 'translate-x-0' : 'translate-x-full',
+          ].join(' ')}
+        >
+          <HelpTabContent onClose={onClose} onOpenVideo={() => setVideoOpen(true)} />
+        </div>
+      </>
+    )
+  }
+
+  // Popup mode — floating card anchored to the FAB
+  if (!layout) return videoOpen ? <FloatingVideoPlayer onClose={() => setVideoOpen(false)} /> : null
 
   return (
     <>
@@ -662,12 +713,20 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
       {/* Context — sticky */}
       <div className="shrink-0 px-4 pt-5">
         <div className="flex items-center gap-3 rounded-[10px] bg-tlx-surface px-3.5 py-2.5">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-[11px] font-medium text-tlx-muted">You're on</p>
             <p className="mt-0.5 truncate text-[13px] font-semibold text-tlx-text">
               {pageContext}
             </p>
           </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-[#617085] transition-colors hover:bg-neutral-100 hover:text-[#20293A]"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </button>
         </div>
       </div>
 
