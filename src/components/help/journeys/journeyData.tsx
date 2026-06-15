@@ -62,8 +62,6 @@ export const JOURNEYS: JourneyDef[] = [
       {
         text: 'Filters let you narrow your view by status, platform, or risk level — essential when your fleet of data sources grows.',
         target: '[data-v1-filter]',
-        interactive: true,
-        actionHint: 'Try it — click the Filters button',
       },
       {
         text: 'Register Data Source connects a new platform like Snowflake, Databricks, or SQL Server. The guided setup walks you through prerequisites and authentication.',

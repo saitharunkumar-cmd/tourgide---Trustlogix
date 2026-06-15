@@ -171,7 +171,7 @@ function ChaptersCard() {
     )
   }
 
-  const pct = (progress / TOTAL) * 100
+  const pct = ((progress - 1) / TOTAL) * 100
 
   return (
     <aside

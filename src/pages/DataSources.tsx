@@ -87,16 +87,16 @@ export default function DataSources() {
           <button
             type="button"
             data-v1-filter
-            className="inline-flex items-center gap-2 rounded-[5px] border border-tlx-border bg-white px-4 py-2 text-[13px] font-semibold text-grey-300 transition-colors hover:border-[#00A8CF] hover:text-[#00A8CF]"
+            className="inline-flex items-center gap-2 rounded-[5px] border border-[#20292a] bg-white px-4 py-2 text-[14px] font-normal text-[#20292a] transition-colors hover:border-[#00A8CF] hover:text-[#00A8CF]"
           >
-            <FilterIcon className="h-4 w-4" />
+            <FilterIcon className="h-4 w-4 text-grey-300" />
             Filters
           </button>
           <button
             type="button"
             data-v1-register
             className={[
-              'inline-flex items-center gap-2 rounded-[5px] bg-brand-500 px-4 py-2 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-[#66CAE3]',
+              'inline-flex items-center gap-2 rounded-[5px] bg-brand-500 px-4 py-2 text-[14px] font-normal text-white shadow-sm transition-colors hover:bg-[#66CAE3]',
               phase === 'journey' && subStep === 'instruction' ? 'animate-ripple-ring' : '',
             ].join(' ')}
           >
@@ -106,14 +106,14 @@ export default function DataSources() {
           <button
             type="button"
             aria-label="Grid view"
-            className="flex h-9 w-9 items-center justify-center rounded-[5px] border border-tlx-border bg-white text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
+            className="flex h-9 w-9 items-center justify-center rounded-[5px] border border-[#20292a] bg-white text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
           >
             <GridIcon className="h-4 w-4" />
           </button>
           <button
             type="button"
             aria-label="Column settings"
-            className="flex h-9 w-9 items-center justify-center rounded-[5px] border border-tlx-border bg-white text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
+            className="flex h-9 w-9 items-center justify-center rounded-[5px] border border-[#20292a] bg-white text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
           >
             <ColumnsIcon className="h-4 w-4" />
           </button>
@@ -123,7 +123,7 @@ export default function DataSources() {
       <TourVersionBar />
 
       {/* Table */}
-      <div className="mt-5 overflow-hidden rounded-[10px] border border-tlx-border bg-white shadow-tlx-sm">
+      <div className="mt-5 overflow-hidden border border-tlx-border bg-white shadow-tlx-sm">
         <table className="w-full border-collapse text-[13px]">
           <thead>
             <tr className="border-b border-tlx-border bg-neutral-100 text-left">

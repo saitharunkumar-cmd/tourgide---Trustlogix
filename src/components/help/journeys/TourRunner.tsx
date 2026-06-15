@@ -113,6 +113,7 @@ export default function TourRunner() {
           totalSteps={activeJourney.totalSteps}
           interactive={step.interactive}
           actionHint={step.actionHint}
+          requireInteract={!!step.interactAction}
           onPrev={prevStep}
           onNext={nextStep}
           onPause={pauseTour}
@@ -145,6 +146,7 @@ function TourOverlay({
   totalSteps,
   interactive,
   actionHint,
+  requireInteract,
   onPrev,
   onNext,
   onPause,
@@ -157,6 +159,7 @@ function TourOverlay({
   totalSteps: number
   interactive?: boolean
   actionHint?: string
+  requireInteract?: boolean
   onPrev: () => void
   onNext: () => void
   onPause: () => void
@@ -169,7 +172,7 @@ function TourOverlay({
   const CARD_H = 220
   const GAP = 12
   const EDGE = 16
-  const pct = ((stepIndex + 1) / totalSteps) * 100
+  const pct = (stepIndex / totalSteps) * 100
 
   const card: React.CSSProperties = (() => {
     if (!rect) {
@@ -368,16 +371,18 @@ function TourOverlay({
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
               </button>
             )}
-            <button
-              type="button"
-              onClick={onNext}
-              className="inline-flex items-center gap-1.5 rounded-[5px] bg-[#00A8CF] px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-[#66CAE3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
-            >
-              {isLast ? 'Finish' : 'Next'}
-              {!isLast && (
-                <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
-              )}
-            </button>
+            {!requireInteract && (
+              <button
+                type="button"
+                onClick={onNext}
+                className="inline-flex items-center gap-1.5 rounded-[5px] bg-[#00A8CF] px-4 py-2 text-[12px] font-semibold text-white transition-colors hover:bg-[#66CAE3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
+              >
+                {isLast ? 'Finish' : 'Next'}
+                {!isLast && (
+                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+                )}
+              </button>
+            )}
           </div>
         </div>
       </div>
