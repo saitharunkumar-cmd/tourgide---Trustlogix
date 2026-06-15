@@ -120,8 +120,6 @@ export default function DataSources() {
         </div>
       </div>
 
-      <TourVersionBar />
-
       {/* Table */}
       <div className="mt-5 overflow-hidden border border-tlx-border bg-white shadow-tlx-sm">
         <table className="w-full border-collapse text-[13px]">
