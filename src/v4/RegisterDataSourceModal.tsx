@@ -427,6 +427,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
   const { selectVariant, selectedDatasource, accountName, downloadClicked, prerequisitesChecked } = useJourneyIntro()
   const [rect, setRect] = useState<OverlayRect | null>(null)
   const [stepIdx, setStepIdx] = useState(0)
+  const cardRef = useRef<HTMLDivElement>(null)
 
   const PAGE_STEPS: Record<string, V1SubStep[]> = {
     select: ['select-platform', 'enter-name', 'click-continue'],
@@ -491,7 +492,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
   const EDGE = 16
   const vh = window.innerHeight
   const vw = window.innerWidth
-  const CARD_EST_H = 260
+  const cardH = cardRef.current?.offsetHeight ?? 260
 
   let cardTop: number
   let cardLeft: number
@@ -502,19 +503,19 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
   const preferAbove = sub === 'enter-name'
 
   if (!preferAbove && right >= CW + EDGE) {
-    cardTop = clamp(rect.top, EDGE, vh - CARD_EST_H)
+    cardTop = clamp(rect.top, EDGE, vh - cardH)
     cardLeft = rect.left + rect.width + GAP
-  } else if (preferAbove && above >= CARD_EST_H) {
-    cardTop = rect.top - CARD_EST_H - GAP
+  } else if (preferAbove && above >= cardH) {
+    cardTop = rect.top - cardH - GAP
     cardLeft = clamp(rect.left, EDGE, vw - CW - EDGE)
-  } else if (!preferAbove && below >= CARD_EST_H) {
+  } else if (!preferAbove && below >= cardH) {
     cardTop = rect.top + rect.height + GAP
     cardLeft = clamp(rect.left, EDGE, vw - CW - EDGE)
-  } else if (above >= CARD_EST_H) {
-    cardTop = rect.top - CARD_EST_H - GAP
+  } else if (above >= cardH) {
+    cardTop = rect.top - cardH - GAP
     cardLeft = clamp(rect.left, EDGE, vw - CW - EDGE)
   } else {
-    cardTop = clamp(rect.top + rect.height + GAP, EDGE, vh - CARD_EST_H)
+    cardTop = clamp(rect.top + rect.height + GAP, EDGE, vh - cardH)
     cardLeft = clamp(rect.left, EDGE, vw - CW - EDGE)
   }
 
@@ -575,6 +576,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
       </svg>
 
       <div
+        ref={cardRef}
         key={sub}
         data-tour-card
         style={{ position: 'absolute', top: cardTop, left: cardLeft, width: CW }}
