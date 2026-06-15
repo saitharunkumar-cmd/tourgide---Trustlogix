@@ -134,8 +134,14 @@ function ChaptersCard() {
 
   const fabSize = 56
   const vh = typeof window !== 'undefined' ? window.innerHeight : 900
+  const vw = typeof window !== 'undefined' ? window.innerWidth : 1440
   const cardBottom = fabPos ? Math.max(vh - fabPos.y - fabSize, MARGIN) : MARGIN
-  const cardLeft = fabPos ? Math.max(fabPos.x - fabSize / 2 - 12 - CARD_WIDTH, MARGIN) : MARGIN
+  const fabOnLeft = fabPos ? fabPos.x < vw / 2 : false
+  const cardLeft = fabPos
+    ? fabOnLeft
+      ? Math.min(fabPos.x + fabSize / 2 + 12, vw - CARD_WIDTH - MARGIN)
+      : Math.max(fabPos.x - fabSize / 2 - 12 - CARD_WIDTH, MARGIN)
+    : MARGIN
   const cardStyle: React.CSSProperties = {
     position: 'fixed',
     left: cardLeft,

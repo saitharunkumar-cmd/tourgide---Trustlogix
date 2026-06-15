@@ -51,11 +51,40 @@ export default function HelpTrigger({
     }
   }, [clamp])
 
+  const [nudged, setNudged] = useState(false)
+
   useEffect(() => {
     const onResize = () => setPos((p) => (p ? clamp(p.x, p.y) : p))
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [clamp])
+
+  useEffect(() => {
+    let prev = false
+    const check = () => {
+      const size = btnRef.current?.offsetWidth ?? 56
+      const homeX = window.innerWidth - size - MARGIN
+      const homeY = window.innerHeight - size - MARGIN
+      const PAD = 20
+      const homeRect = { left: homeX - PAD, top: homeY - PAD, right: homeX + size + PAD, bottom: homeY + size + PAD }
+      const cards = document.querySelectorAll('[data-tour-card]')
+      let overlaps = false
+      cards.forEach((card) => {
+        const cr = card.getBoundingClientRect()
+        if (cr.width === 0) return
+        if (homeRect.right > cr.left && homeRect.left < cr.right && homeRect.bottom > cr.top && homeRect.top < cr.bottom) {
+          overlaps = true
+        }
+      })
+      if (overlaps !== prev) { prev = overlaps; setNudged(overlaps) }
+    }
+    check()
+    const observer = new MutationObserver(check)
+    observer.observe(document.body, { childList: true, subtree: true })
+    window.addEventListener('resize', check)
+    const interval = setInterval(check, 500)
+    return () => { observer.disconnect(); window.removeEventListener('resize', check); clearInterval(interval) }
+  }, [])
 
   const onPointerDown = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (!pos) return
@@ -106,12 +135,15 @@ export default function HelpTrigger({
     onToggle?.()
   }
 
+  const displayX = nudged ? MARGIN : pos?.x
+  const displayY = nudged ? (pos?.y ?? window.innerHeight - 72) : pos?.y
+
   return (
     <div
       style={{
         position: 'fixed',
-        left: pos?.x,
-        top: pos?.y,
+        left: displayX,
+        top: displayY,
         zIndex: 10100,
         visibility: pos ? 'visible' : 'hidden',
         transition: dragging

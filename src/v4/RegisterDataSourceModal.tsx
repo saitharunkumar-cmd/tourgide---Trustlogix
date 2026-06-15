@@ -571,6 +571,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
 
       <div
         key={sub}
+        data-tour-card
         style={{ position: 'absolute', top: cardTop, left: cardLeft, width: CW }}
         className="pointer-events-auto animate-tour-enter rounded-[10px] border border-tlx-border bg-white shadow-[0_30px_80px_-24px_rgba(32,41,58,0.32)]"
       >
@@ -956,6 +957,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
         ref={ref}
         data-v4-journey
         data-v4-callout-card
+        data-tour-card
         role="dialog"
         aria-label={title}
         style={{
