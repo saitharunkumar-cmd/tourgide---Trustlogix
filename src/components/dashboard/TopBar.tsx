@@ -1,7 +1,7 @@
 import { ClockIcon } from '../icons'
 import { ChevronsLeftIcon, BellIcon, HelpIcon } from '../navIcons'
 
-export default function TopBar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
+export default function TopBar({ collapsed, onToggleSidebar }: { collapsed: boolean; onToggleSidebar: () => void }) {
   return (
     <header className="flex h-14 shrink-0 items-center justify-between border-b border-tlx-border bg-white px-5">
       <button
@@ -10,7 +10,12 @@ export default function TopBar({ onToggleSidebar }: { onToggleSidebar: () => voi
         aria-label="Toggle sidebar"
         className="flex h-8 w-8 items-center justify-center rounded-[5px] border border-tlx-border text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
       >
-        <ChevronsLeftIcon className="h-4.5 w-4.5" />
+        <ChevronsLeftIcon
+          className={[
+            'h-4.5 w-4.5 transition-transform duration-300',
+            collapsed ? 'rotate-180' : '',
+          ].join(' ')}
+        />
       </button>
 
       <div className="flex items-center gap-3">
