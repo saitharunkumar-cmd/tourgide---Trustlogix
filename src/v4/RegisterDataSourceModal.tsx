@@ -1200,8 +1200,8 @@ function ConnectionContent({ isV2, onFieldChange }: { isV2: boolean; onFieldChan
     <div data-v1-register-card className="mt-5 rounded-2xl border border-tlx-border bg-white p-6 shadow-sm">
       <p className="text-sm font-bold text-tlx-text">Connection Configuration</p>
       <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-5 lg:grid-cols-2">
-        <div>
-          <div className={['relative rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('account-id')].join(' ')} data-v4-conn-account-id>
+        <div data-v4-conn-account-id>
+          <div className={['relative rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('account-id')].join(' ')}>
             <input type="text" id="v4-conn-account-id" value={accountId} onChange={(e) => setAccountId(e.target.value)} placeholder=" " className="peer block w-full rounded-lg border-0 bg-[#FFFFFF] px-3.5 py-3.5 pr-44 text-sm text-[#20293A] focus:outline-none focus:ring-0" />
             <label htmlFor="v4-conn-account-id" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">Account Identifier</label>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center border-l border-tlx-border px-3 text-xs text-tlx-secondary">.snowflakecomputing.com</span>

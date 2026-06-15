@@ -69,7 +69,7 @@ function computeLayout(size: Size | null): Layout {
 
   const tablet = vw < 1024
   const defaultW = tablet ? 380 : 420
-  const defaultH = tablet ? Math.round(vh * 0.7) : Math.round(Math.min(650, vh * 0.8))
+  const defaultH = tablet ? Math.round(vh * 0.75) : Math.round(Math.min(vh * 0.85, vh - MARGIN * 2))
 
   const width = clampN(size?.width ?? defaultW, MIN_W, vw - MARGIN * 2)
   const height = clampN(size?.height ?? defaultH, MIN_H, vh - MARGIN * 2)
