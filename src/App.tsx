@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { Agentation } from 'agentation'
+// import { Agentation } from 'agentation'
 import { ToastProvider } from './toast/ToastContext'
 import { OnboardingProvider } from './onboarding/OnboardingContext'
 import { JourneysProvider } from './components/help/journeys/JourneysContext'
@@ -32,7 +32,7 @@ export default function App() {
             <JourneyIntroCard />
             <Chapter1Journey />
             <RegisterDataSourceModal />
-            <Agentation />
+            {/* <Agentation /> */}
           </JourneyIntroProvider>
         </JourneysProvider>
       </OnboardingProvider>
