@@ -36,6 +36,10 @@ export default function TopBar({ collapsed, onToggleSidebar }: { collapsed: bool
         <button
           type="button"
           aria-label="Help"
+          onClick={() => {
+            const fab = document.querySelector<HTMLButtonElement>('button[aria-label="Help and Guidance"]')
+            fab?.click()
+          }}
           className="flex h-8 w-8 items-center justify-center rounded-[5px] text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
         >
           <HelpIcon className="h-[18px] w-[18px]" />

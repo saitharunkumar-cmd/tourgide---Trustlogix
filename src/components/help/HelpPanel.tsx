@@ -450,7 +450,9 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
   const journeyCTA = useJourneyCTA(pageContext)
   const [messages, setMessages] = useState<ChatMsg[]>([])
   const [chatInput, setChatInput] = useState('')
+  const [askAIOpen, setAskAIOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const chatInputRef = useRef<HTMLInputElement>(null)
   const idRef = useRef(0)
 
   const tourVersion = readTourVersion()
@@ -462,6 +464,7 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
   const ask = (q: string) => {
     const query = q.trim()
     if (!query) return
+    if (!askAIOpen) setAskAIOpen(true)
     const topic: 'data-sources' | 'generic' = /data\s*source/i.test(query) ? 'data-sources' : 'generic'
     setMessages((m) => [
       ...m,
@@ -474,6 +477,15 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
     e.preventDefault()
     ask(chatInput)
     setChatInput('')
+  }
+
+  const openAskAI = () => {
+    setAskAIOpen(true)
+    setTimeout(() => chatInputRef.current?.focus(), 100)
+  }
+
+  const closeAskAI = () => {
+    setAskAIOpen(false)
   }
 
   const startTour = () => {
@@ -516,6 +528,134 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
     const el = scrollRef.current
     if (el && messages.length) el.scrollTop = el.scrollHeight
   }, [messages])
+
+  if (askAIOpen) {
+    return (
+      <div role="tabpanel" className="flex min-h-0 flex-1 flex-col">
+        {/* Ask AI Header */}
+        <div className="flex shrink-0 items-center gap-2 border-b border-[#E4E7EB] px-3 py-2.5">
+          {/* Back button */}
+          <button
+            type="button"
+            onClick={closeAskAI}
+            aria-label="Back to Help &amp; Guidance"
+            className="group flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#F2F4F7] text-[#617085] transition-all hover:bg-[#E8F7FB] hover:text-[#00A8CF] active:scale-95"
+          >
+            <svg className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+
+          {/* Divider */}
+          <div className="h-5 w-px bg-[#E4E7EB]" />
+
+          {/* AI identity */}
+          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#00A8CF] to-[#1EAEAB]">
+            <GuardianAgentIcon className="h-3.5 w-3.5 [&_path]:fill-white" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h3 className="text-[13px] font-semibold leading-tight text-[#20293A]">Ask AI</h3>
+            <p className="text-[10px] leading-tight text-[#617085]">Guardian Agent</p>
+          </div>
+
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={() => { closeAskAI(); onClose(); }}
+            aria-label="Close"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-[#617085] transition-colors hover:bg-neutral-100 hover:text-[#20293A]"
+          >
+            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+          </button>
+        </div>
+
+        {/* Chat body */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 pb-4">
+          {messages.length === 0 ? (
+            <div className="mt-6">
+              <div className="text-center">
+                <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F7FB]">
+                  <SparkleIcon className="h-5 w-5 text-[#00A8CF]" />
+                </span>
+                <h4 className="mt-3 text-[14px] font-semibold text-[#20293A]">How can I help?</h4>
+                <p className="mt-1 text-[12px] text-[#617085]">Ask anything about your data security, policies, or platform.</p>
+              </div>
+
+              <p className="mb-2.5 mt-6 text-[11px] font-semibold uppercase tracking-wider text-[#8A95A8]">Suggested questions</p>
+              <div className="space-y-2">
+                {topics.map(({ icon: Icon, title, description }) => (
+                  <button
+                    key={title}
+                    type="button"
+                    onClick={() => ask(title)}
+                    className="group flex w-full items-center gap-3 rounded-[8px] border border-[#E4E7EB] bg-white px-3 py-2.5 text-left transition-all hover:border-[#CCEEF4] hover:bg-[#F5FCFE]"
+                  >
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[6px] bg-[#F2F4F7] text-[#8A95A8] transition-colors group-hover:bg-[#CCEEF4] group-hover:text-[#00A8CF]">
+                      <Icon className="h-4 w-4" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13px] font-medium text-[#20293A]">{title}</span>
+                      <span className="block truncate text-[11px] text-[#8A95A8]">{description}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="mt-4 space-y-3">
+              {messages.map((m) =>
+                m.role === 'user' ? (
+                  <div
+                    key={m.id}
+                    data-role="user"
+                    className="ml-auto w-fit max-w-[85%] rounded-full bg-[#00A8CF] px-4 py-2 text-[13px] font-medium text-white"
+                  >
+                    {m.text}
+                  </div>
+                ) : (
+                  <AgentAnswer key={m.id} topic={m.topic} onStartTour={startTour} onAsk={ask} onOpenVideo={onOpenVideo} />
+                ),
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Ask AI input */}
+        <div className="shrink-0 border-t border-[#E4E7EB] bg-white px-4 pb-3 pt-3">
+          <form onSubmit={handleAsk} className="flex items-center gap-1.5 rounded-[15px] border border-[#E4E7EB] bg-[#FAFBFD] px-1.5 py-1.5 transition-colors focus-within:border-[#00A8CF] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#CCEEF4]">
+            <input
+              ref={chatInputRef}
+              id="help-ask"
+              name="question"
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              aria-label="Ask AI a question"
+              placeholder="Ask a question..."
+              className="min-w-0 flex-1 bg-transparent px-3 text-[13px] text-[#20293A] placeholder:text-[#B8BFC9] focus:outline-none"
+            />
+            <button
+              type="button"
+              aria-label="Voice input"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[#E4E7EB] bg-white text-[#8A95A8] transition-colors hover:bg-neutral-100 hover:text-[#20293A]"
+            >
+              <Mic className="h-4 w-4" strokeWidth={1.7} />
+            </button>
+            <button
+              type="submit"
+              aria-label="Send question"
+              className={[
+                'flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200',
+                chatInput.trim()
+                  ? 'bg-[#00A8CF] text-white hover:bg-[#66CAE3]'
+                  : 'bg-[#CCEDF6] text-white',
+              ].join(' ')}
+            >
+              <Send className="h-4 w-4" strokeWidth={1.7} />
+            </button>
+          </form>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div role="tabpanel" className="flex min-h-0 flex-1 flex-col">
@@ -641,63 +781,46 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
             </button>
           ))}
         </div>
-
-
-        {/* Chat thread */}
-        {messages.length > 0 && (
-          <div className="mt-5 space-y-3 border-t border-tlx-border pt-4">
-            {messages.map((m) =>
-              m.role === 'user' ? (
-                <div
-                  key={m.id}
-                  data-role="user"
-                  className="ml-auto w-fit max-w-[80%] rounded-2xl rounded-br-md bg-brand-500 px-3.5 py-2 text-[13px] text-white"
-                >
-                  {m.text}
-                </div>
-              ) : (
-                <AgentAnswer key={m.id} topic={m.topic} onStartTour={startTour} onAsk={ask} onOpenVideo={onOpenVideo} />
-              ),
-            )}
-          </div>
-        )}
       </div>
 
-      {/* Ask input */}
-      <div className="shrink-0 bg-white px-4 pb-3 pt-3">
-        <form onSubmit={handleAsk} className="flex items-center gap-1.5 rounded-[15px] border border-[#E4E7EB] bg-white px-1.5 py-1.5">
-          <input
-            id="help-ask"
-            name="question"
-            type="text"
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            aria-label="Ask about your data security"
-            placeholder="Ask about your data security..."
-            className="min-w-0 flex-1 bg-transparent px-3 text-[13px] text-[#617085] placeholder:text-[#B8BFC9] focus:outline-none"
-          />
-          <button
-            type="button"
-            aria-label="Attach"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] border border-[#E4E7EB] bg-[#FAFBFD] text-[#8A95A8] transition-colors hover:bg-neutral-100"
-          >
-            <Mic className="h-4 w-4" strokeWidth={1.7} />
-          </button>
-          <button
-            type="submit"
-            aria-label="Send question"
-            className={[
-              'flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200',
-              chatInput.trim()
-                ? 'bg-[#00A8CF] text-white hover:bg-[#66CAE3]'
-                : 'bg-[#CCEDF6] text-white',
-            ].join(' ')}
-          >
-            <Send className="h-4 w-4" strokeWidth={1.7} />
-          </button>
-        </form>
+      {/* Ask AI button */}
+      <div className="shrink-0 px-4 pb-3 pt-2">
+        <button
+          type="button"
+          onClick={openAskAI}
+          className="group relative flex w-full items-center gap-3 overflow-hidden rounded-2xl px-4 py-3.5 text-left shadow-[0_4px_16px_rgba(0,168,207,.2)] transition-all duration-300 hover:shadow-[0_8px_28px_rgba(0,168,207,.35)] active:scale-[.98]"
+          style={{ background: 'linear-gradient(135deg, #6FBE46 0%, #41B57F 34%, #1EAEAB 63%, #08AAC5 86%, #00A8CF 100%)' }}
+        >
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,.3)]">
+            <GuardianAgentIcon className="h-5 w-5 [&_path]:fill-white transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <span className="block text-[13px] font-semibold text-white">Ask AI</span>
+            <span className="block text-[11px] text-white/75">Ask about your data security...</span>
+          </div>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/20 shadow-[inset_0_1px_0_rgba(255,255,255,.3)] transition-all duration-200 group-hover:bg-white/30">
+            <Send className="h-3.5 w-3.5 text-white transition-transform duration-200 group-hover:-translate-y-[1px] group-hover:translate-x-[1px]" strokeWidth={1.7} />
+          </span>
+        </button>
       </div>
     </div>
+  )
+}
+
+function GuardianAgentIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11.5643 1.58301C11.3732 1.3881 11.3732 1.07623 11.5643 0.881309L12.1977 0.235294C12.3888 0.0403759 12.6945 0.0403759 12.8856 0.235294C13.0767 0.430212 13.0767 0.742081 12.8856 0.937L12.2523 1.58301C12.1594 1.67769 12.0339 1.72781 11.9083 1.72781C11.7827 1.72781 11.6626 1.67769 11.5643 1.58301ZM9.75157 2.73582C9.56047 2.93073 9.56047 3.2426 9.75157 3.43752C9.84439 3.5322 9.96997 3.58232 10.0955 3.58232C10.2211 3.58232 10.3412 3.5322 10.4395 3.43752L11.0729 2.79151C11.264 2.59659 11.264 2.28472 11.0729 2.0898C10.8818 1.89488 10.576 1.89488 10.3849 2.0898L9.75157 2.73582ZM7.75321 18.4184L7.11985 19.0644C6.92875 19.2593 6.92875 19.5712 7.11985 19.7661C7.21267 19.8608 7.33825 19.9109 7.46383 19.9109C7.58941 19.9109 7.70953 19.8608 7.80781 19.7661L8.44117 19.1201C8.63227 18.9252 8.63227 18.6133 8.44117 18.4184C8.25007 18.2235 7.94431 18.2235 7.75321 18.4184ZM10.2539 17.2656C10.445 17.0707 10.445 16.7588 10.2539 16.5639C10.0628 16.369 9.75703 16.369 9.56593 16.5639L8.93257 17.2099C8.74147 17.4048 8.74147 17.7167 8.93257 17.9116C9.02539 18.0063 9.15097 18.0564 9.27655 18.0564C9.40213 18.0564 9.52225 18.0063 9.62053 17.9116L10.2539 17.2656ZM9.51679 13.5621C9.51679 11.8691 8.16817 10.4936 6.50833 10.4936C6.24079 10.4936 6.02239 10.2708 6.02239 9.99791C6.02239 9.72503 6.24079 9.50226 6.50833 9.50226C8.16817 9.50226 9.51679 8.1267 9.51679 6.43369C9.51679 6.16081 9.73519 5.93804 10.0027 5.93804C10.2703 5.93804 10.4887 6.16081 10.4887 6.43369C10.4887 8.1267 11.8373 9.50226 13.4971 9.50226C13.7647 9.50226 13.9831 9.72503 13.9831 9.99791C13.9831 10.2708 13.7647 10.4936 13.4971 10.4936C11.8373 10.4936 10.4887 11.8691 10.4887 13.5621C10.4887 13.835 10.2703 14.0578 10.0027 14.0578C9.73519 14.0578 9.51679 13.835 9.51679 13.5621ZM10.0027 11.6241C10.3686 10.9391 10.9255 10.3766 11.5916 10.0035C10.92 9.63035 10.3686 9.06787 10.0027 8.38287C9.63691 9.06787 9.07999 9.63035 8.41387 10.0035C9.08545 10.3766 9.63691 10.9447 10.0027 11.6241ZM7.85695 17.583C7.97707 17.5329 8.06989 17.4382 8.11903 17.3157C8.14087 17.2544 8.15725 17.1932 8.15725 17.1263V15.244C8.15725 14.9711 7.93885 14.7483 7.67131 14.7483C7.40377 14.7483 7.18537 14.9711 7.18537 15.244V15.929L1.37046 9.99791L10.3467 0.847894C10.5378 0.652976 10.5378 0.341107 10.3467 0.146189C10.1556 -0.0487296 9.84985 -0.0487296 9.65875 0.146189L0 9.99791L6.50287 16.6307H5.83129C5.56375 16.6307 5.34534 16.8535 5.34534 17.1263C5.34534 17.3992 5.56375 17.622 5.83129 17.622H7.67677C7.74229 17.622 7.80235 17.6109 7.86241 17.583H7.85695ZM13.5026 3.36512H14.1742C14.4417 3.36512 14.6601 3.14236 14.6601 2.86947C14.6601 2.59659 14.4417 2.37383 14.1742 2.37383H12.3287C12.2632 2.37383 12.2031 2.38496 12.1431 2.41281C12.0229 2.46293 11.9301 2.55761 11.881 2.68013C11.8591 2.74139 11.8428 2.80265 11.8428 2.86947V4.75183C11.8428 5.02471 12.0612 5.24748 12.3287 5.24748C12.5962 5.24748 12.8146 5.02471 12.8146 4.75183V4.06683L18.6295 9.99791L9.65329 19.1535C9.46219 19.3484 9.46219 19.6603 9.65329 19.8552C9.74611 19.9499 9.87169 20 9.99727 20C10.1229 20 10.243 19.9499 10.3412 19.8552L20 10.0035L13.4971 3.37069L13.5026 3.36512Z" fill="url(#guardian-gradient)"/>
+      <defs>
+        <linearGradient id="guardian-gradient" x1="10" y1="20" x2="10" y2="0" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#6FBE46"/>
+          <stop offset="0.34" stopColor="#41B57F"/>
+          <stop offset="0.63" stopColor="#1EAEAB"/>
+          <stop offset="0.86" stopColor="#08AAC5"/>
+          <stop offset="1" stopColor="#00A8CF"/>
+        </linearGradient>
+      </defs>
+    </svg>
   )
 }
 
@@ -713,49 +836,49 @@ function AgentAnswer({
   onOpenVideo: () => void
 }) {
   return (
-    <div className="rounded-[10px] border border-tlx-border bg-white p-3.5">
-      <div className="flex items-center gap-1.5">
-        <SparkleIcon className="h-3.5 w-3.5 text-brand-500" />
-        <span className="text-[11px] font-bold uppercase tracking-wide text-tlx-muted">
+    <div className="rounded-2xl border border-[#E4E7EB] bg-white p-4">
+      <div className="flex items-center gap-2">
+        <GuardianAgentIcon className="h-4 w-4" />
+        <span className="text-[11px] font-bold uppercase tracking-wider text-[#8A95A8]">
           Guardian Agent
         </span>
       </div>
       {topic === 'data-sources' ? (
         <>
-          <p className="mt-2 text-[13px] leading-relaxed text-tlx-secondary">
-            A <span className="font-semibold text-tlx-text">data source</span> is any system
+          <p className="mt-3 text-[13px] leading-[1.7] text-[#617085]">
+            A <span className="font-semibold text-[#00A8CF]">data source</span> is any system
             TrustLogix connects to — like Snowflake, Databricks or Power BI — to discover sensitive
             data, analyze who can access it, and enforce least-privilege policies. The Data Sources
             page lists each connected source with its access policies, monitoring coverage and data
             risk.
           </p>
-          <p className="mt-2 text-[13px] leading-relaxed text-tlx-secondary">
+          <p className="mt-2.5 text-[13px] leading-[1.7] text-[#617085]">
             Want a hands-on walkthrough? I can guide you through it as a few quick missions.
           </p>
-          <div className="mt-3 flex items-center gap-2">
+          <div className="mt-4 flex items-center gap-2.5">
             <button
               type="button"
               onClick={onStartTour}
-              className="flex-1 rounded-[5px] bg-brand-500 px-4 py-2 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-[#66CAE3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
+              className="flex-1 rounded-lg bg-[#00A8CF] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-[#66CAE3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
             >
               Start Data Sources Tour
             </button>
             <button
               type="button"
               onClick={onOpenVideo}
-              className="flex items-center gap-1.5 rounded-[5px] border border-[#617085] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#617085] transition-colors hover:border-[#00A8CF] hover:text-[#00A8CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
+              className="rounded-lg border border-[#E4E7EB] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#617085] transition-colors hover:border-[#00A8CF] hover:text-[#00A8CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
             >
               Watch Video
             </button>
           </div>
         </>
       ) : (
-        <p className="mt-2 text-[13px] leading-relaxed text-tlx-secondary">
+        <p className="mt-3 text-[13px] leading-[1.7] text-[#617085]">
           I can help with that. Try asking about your{' '}
           <button
             type="button"
             onClick={() => onAsk('What is a data source?')}
-            className="font-semibold text-brand-600 hover:underline"
+            className="font-semibold text-[#00A8CF] hover:underline"
           >
             data sources
           </button>
