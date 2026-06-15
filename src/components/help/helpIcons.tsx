@@ -119,7 +119,7 @@ export const WelcomeArt = ({ className = '' }: { className?: string }) => (
   <svg className={className} viewBox="0 0 120 120" fill="none" aria-hidden="true">
     <path d="M58 64 78 54l20 10-20 10-20-10Z" fill="#99DCED" />
     <path d="M58 64v20l20 10V74L58 64Z" fill="#00A8CF" />
-    <path d="M98 64v20L78 94V74l20-10Z" fill="#047690" />
+    <path d="M98 64v20L78 94V74l20-10Z" fill="#00A8CF" />
     <circle cx="52" cy="44" r="14" fill="#E8F7FB" stroke="#00A8CF" strokeWidth="3" />
     <circle cx="52" cy="44" r="6" fill="#CCEDF6" />
     <path d="m62 54 9 9" stroke="#00A8CF" strokeWidth="4" strokeLinecap="round" />
@@ -138,7 +138,7 @@ export const JourneyArt = ({ className = '' }: { className?: string }) => (
       strokeLinecap="round"
       strokeDasharray="2 5"
     />
-    <circle cx="44" cy="60" r="4" fill="#047690" />
+    <circle cx="44" cy="60" r="4" fill="#00A8CF" />
     <path d="M104 44v18" stroke="#00A8CF" strokeWidth="2.4" strokeLinecap="round" />
     <path d="M104 44h10l-3 4 3 4h-10" fill="#00A8CF" />
     <path d="M70 30c4 0 7 3 7 7 0 5-7 11-7 11s-7-6-7-11c0-4 3-7 7-7Z" fill="#00A8CF" />

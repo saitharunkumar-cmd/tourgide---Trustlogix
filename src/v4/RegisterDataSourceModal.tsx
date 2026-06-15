@@ -1225,7 +1225,7 @@ function ConnectionContent({ isV2, onFieldChange }: { isV2: boolean; onFieldChan
             ))}
           </div>
         </div>
-        <div data-v4-conn-username className={['relative rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('username')].join(' ')}>
+        <div data-v4-conn-username className={['relative self-start rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('username')].join(' ')}>
           <input type="text" id="v4-conn-username" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder=" " className="peer block w-full rounded-lg border-0 bg-[#FFFFFF] px-3.5 py-3.5 text-sm text-[#20293A] focus:outline-none focus:ring-0" />
           <label htmlFor="v4-conn-username" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">User Name</label>
         </div>
