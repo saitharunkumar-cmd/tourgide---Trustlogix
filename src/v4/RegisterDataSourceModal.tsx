@@ -418,7 +418,7 @@ const V1_TARGET_SEL: Record<V1SubStep, string> = {
   'confirm-check': '[data-v4-prereq-checkbox]',
   'conn-account-id': '[data-v4-conn-account-id] input',
   'conn-username': '[data-v4-conn-username] input',
-  'conn-passphrase': '[data-v4-conn-passphrase] input',
+  'conn-passphrase': '[data-v4-conn-passphrase]',
   'conn-private-key': '[data-v4-upload]',
   'conn-save': '[data-v4-save]',
 }
