@@ -250,27 +250,27 @@ export default function RegisterDataSourceModal() {
               </div>
               </div>
 
-              <div className="mt-7 max-w-xl" data-v4-account-name-section>
-                <label
-                  htmlFor="v4-account-name"
-                  className="block text-xs font-medium text-tlx-secondary"
-                >
-                  Account Name<span className="text-danger">*</span>
-                </label>
+              <div className="relative mt-7" data-v4-account-name-section>
                 <input
                   id="v4-account-name"
                   type="text"
                   value={accountName}
                   onChange={(e) => setAccountName(e.target.value)}
-                  placeholder="e.g. production-snowflake"
+                  placeholder=" "
                   className={[
-                    'mt-1.5 block w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-tlx-text placeholder:text-tlx-muted focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100',
+                    'peer block w-full rounded-lg border bg-[#FFFFFF] px-3.5 py-3.5 text-sm text-[#20293A] focus:border-[#2D3A50] focus:outline-none focus:ring-1 focus:ring-[#2D3A50]',
                     selectedDatasource && !accountName.trim()
                       ? 'border-brand-500 ring-2 ring-brand-200 animate-ripple-ring'
-                      : 'border-tlx-border',
+                      : 'border-[#2D3A50]',
                   ].join(' ')}
                   data-v4-account-name
                 />
+                <label
+                  htmlFor="v4-account-name"
+                  className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs"
+                >
+                  Account Name<span className="text-danger">*</span>
+                </label>
               </div>
             </div>
           ) : currentPage === 'prerequisites' ? (
@@ -499,10 +499,15 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
   const above = rect.top - GAP
   const right = vw - (rect.left + rect.width + GAP)
 
-  if (right >= CW + EDGE) {
+  const preferAbove = sub === 'enter-name'
+
+  if (!preferAbove && right >= CW + EDGE) {
     cardTop = clamp(rect.top, EDGE, vh - CARD_EST_H)
     cardLeft = rect.left + rect.width + GAP
-  } else if (below >= CARD_EST_H) {
+  } else if (preferAbove && above >= CARD_EST_H) {
+    cardTop = rect.top - CARD_EST_H - GAP
+    cardLeft = clamp(rect.left, EDGE, vw - CW - EDGE)
+  } else if (!preferAbove && below >= CARD_EST_H) {
     cardTop = rect.top + rect.height + GAP
     cardLeft = clamp(rect.left, EDGE, vw - CW - EDGE)
   } else if (above >= CARD_EST_H) {
@@ -1194,8 +1199,9 @@ function ConnectionContent({ isV2, onFieldChange }: { isV2: boolean; onFieldChan
       <p className="text-sm font-bold text-tlx-text">Connection Configuration</p>
       <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-5 lg:grid-cols-2">
         <div>
-          <div className={['relative rounded-lg border', pulse('account-id')].join(' ')} data-v4-conn-account-id>
-            <input type="text" value={accountId} onChange={(e) => setAccountId(e.target.value)} placeholder="Account Identifier" className="block w-full rounded-lg border-0 bg-white py-2.5 pl-3.5 pr-44 text-sm text-tlx-text placeholder:text-tlx-muted focus:outline-none focus:ring-0" />
+          <div className={['relative rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('account-id')].join(' ')} data-v4-conn-account-id>
+            <input type="text" id="v4-conn-account-id" value={accountId} onChange={(e) => setAccountId(e.target.value)} placeholder=" " className="peer block w-full rounded-lg border-0 bg-[#FFFFFF] px-3.5 py-3.5 pr-44 text-sm text-[#20293A] focus:outline-none focus:ring-0" />
+            <label htmlFor="v4-conn-account-id" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">Account Identifier</label>
             <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center border-l border-tlx-border px-3 text-xs text-tlx-secondary">.snowflakecomputing.com</span>
           </div>
           <p className="mt-1.5 flex items-center gap-1.5 text-xs text-tlx-secondary">
@@ -1217,11 +1223,15 @@ function ConnectionContent({ isV2, onFieldChange }: { isV2: boolean; onFieldChan
             ))}
           </div>
         </div>
-        <div data-v4-conn-username>
-          <input type="text" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="User Name" className={['block w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-tlx-text placeholder:text-tlx-muted focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100', pulse('username')].join(' ')} />
+        <div data-v4-conn-username className="relative">
+          <input type="text" id="v4-conn-username" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder=" " className={['peer block w-full rounded-lg border bg-[#FFFFFF] px-3.5 py-3.5 text-sm text-[#20293A] focus:border-[#2D3A50] focus:outline-none focus:ring-1 focus:ring-[#2D3A50]', pulse('username')].join(' ')} />
+          <label htmlFor="v4-conn-username" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">User Name</label>
         </div>
         <div data-v4-conn-passphrase>
-          <input type="password" value={passphrase} onChange={(e) => setPassphrase(e.target.value)} placeholder="Passphrase" className={['block w-full rounded-lg border bg-white px-3.5 py-2.5 text-sm text-tlx-text placeholder:text-tlx-muted focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100', pulse('passphrase')].join(' ')} />
+          <div className="relative">
+            <input type="password" id="v4-conn-passphrase" value={passphrase} onChange={(e) => setPassphrase(e.target.value)} placeholder=" " className={['peer block w-full rounded-lg border bg-[#FFFFFF] px-3.5 py-3.5 text-sm text-[#20293A] focus:border-[#2D3A50] focus:outline-none focus:ring-1 focus:ring-[#2D3A50]', pulse('passphrase')].join(' ')} />
+            <label htmlFor="v4-conn-passphrase" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">Passphrase</label>
+          </div>
           <p className="mt-1.5 flex items-center gap-1.5 text-xs text-tlx-secondary">
             <InfoIcon className="h-3.5 w-3.5 text-brand-500" />
             Passphrase used to encrypt the RSA private key.
