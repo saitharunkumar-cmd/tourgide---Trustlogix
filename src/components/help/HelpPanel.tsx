@@ -713,20 +713,12 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
       {/* Context — sticky */}
       <div className="shrink-0 px-4 pt-5">
         <div className="flex items-center gap-3 rounded-[10px] bg-tlx-surface px-3.5 py-2.5">
-          <div className="min-w-0 flex-1">
+          <div className="min-w-0">
             <p className="text-[11px] font-medium text-tlx-muted">You're on</p>
             <p className="mt-0.5 truncate text-[13px] font-semibold text-tlx-text">
               {pageContext}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-[#617085] transition-colors hover:bg-neutral-100 hover:text-[#20293A]"
-          >
-            <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
-          </button>
         </div>
       </div>
 
