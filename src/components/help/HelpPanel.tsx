@@ -7,7 +7,6 @@ import { useJourneyIntro } from '../../v4/JourneyIntroContext'
 import { useJourneys } from './journeys/JourneysContext'
 import { readTourVersion } from '../../missionBoard/tourVersion'
 import {
-  SparkleIcon,
   SendIcon,
   DataSourceIcon,
   SprawlIcon,
@@ -366,9 +365,22 @@ function usePageTopics(pageContext: string): Topic[] {
   return TOPICS_DEFAULT
 }
 
+type AgentTopic =
+  | 'data-sources'
+  | 'data-sprawl'
+  | 'access-analyzer'
+  | 'policies'
+  | 'data-risk'
+  | 'monitoring'
+  | 'authentication'
+  | 'platforms'
+  | 'prerequisites'
+  | 'connect'
+  | 'generic'
+
 type ChatMsg =
   | { id: number; role: 'user'; text: string }
-  | { id: number; role: 'agent'; topic: 'data-sources' | 'generic' }
+  | { id: number; role: 'agent'; topic: AgentTopic }
 
 const REGISTER_STEP_LABELS: Record<string, string> = {
   'select-platform': 'Select Data Source',
@@ -516,7 +528,7 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
     const query = q.trim()
     if (!query) return
     if (!askAIOpen) setAskAIOpen(true)
-    const topic: 'data-sources' | 'generic' = /data\s*source/i.test(query) ? 'data-sources' : 'generic'
+    const topic = resolveTopic(query)
     setMessages((m) => [
       ...m,
       { id: (idRef.current += 1), role: 'user', text: query },
@@ -584,7 +596,7 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
     return (
       <div role="tabpanel" className="flex min-h-0 flex-1 flex-col">
         {/* Ask AI Header */}
-        <div className="flex shrink-0 items-center gap-2 border-b border-[#E4E7EB] px-3 py-2.5">
+        <div className="flex shrink-0 items-center gap-2.5 border-b border-[#E4E7EB] px-3 py-3">
           {/* Back button */}
           <button
             type="button"
@@ -612,7 +624,7 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
             type="button"
             onClick={() => { closeAskAI(); onClose(); }}
             aria-label="Close"
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[5px] text-[#617085] transition-colors hover:bg-neutral-100 hover:text-[#20293A]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[5px] text-[#617085] transition-colors hover:bg-neutral-100 hover:text-[#20293A]"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </button>
@@ -624,13 +636,13 @@ function HelpTabContent({ onClose, onOpenVideo }: { onClose: () => void; onOpenV
             <div className="mt-6">
               <div className="text-center">
                 <span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F7FB]">
-                  <SparkleIcon className="h-5 w-5 text-[#00A8CF]" />
+                  <GuardianAgentIcon className="h-6 w-6" />
                 </span>
                 <h4 className="mt-3 text-[14px] font-semibold text-[#20293A]">How can I help?</h4>
                 <p className="mt-1 text-[12px] text-[#617085]">Ask anything about your data security, policies, or platform.</p>
               </div>
 
-              <p className="mb-2.5 mt-6 text-[11px] font-semibold uppercase tracking-wider text-[#8A95A8]">Suggested questions</p>
+              <p className="mb-2.5 mt-6 text-[11px] font-semibold uppercase tracking-wider text-[#20293A]">Suggested questions</p>
               <div className="space-y-2">
                 {topics.map(({ icon: Icon, title, description }) => (
                   <button
@@ -875,17 +887,94 @@ function GuardianAgentIcon({ className }: { className?: string }) {
   )
 }
 
+// Text answers for each detected topic. The `term` is highlighted in brand
+// color where it appears in the body.
+const AGENT_RESPONSES: Record<
+  Exclude<AgentTopic, 'data-sources' | 'generic'>,
+  { term: string; body: string; tour?: boolean }
+> = {
+  'data-sprawl': {
+    term: 'Data sprawl',
+    body: 'Data sprawl is the uncontrolled spread of sensitive data across systems, copies and shadow datasets. TrustLogix maps where regulated data actually lives and flags unmanaged or duplicated copies, so you can shrink your attack surface.',
+  },
+  'access-analyzer': {
+    term: 'Access Analyzer',
+    body: 'The Access Analyzer examines who can reach each dataset — through roles, direct grants and inherited permissions — and surfaces over-privileged or unused access so you can enforce least privilege.',
+  },
+  policies: {
+    term: 'Access policies',
+    body: 'Access policies define who can read or write specific data, and under what conditions. TrustLogix lets you author, simulate and enforce them centrally across every connected data source.',
+  },
+  'data-risk': {
+    term: 'Data risk',
+    body: 'Data risk scores how exposed a dataset is — based on its sensitivity, who can access it and how well it is monitored. Higher scores tell you which data needs attention first.',
+  },
+  monitoring: {
+    term: 'Monitoring policies',
+    body: 'Monitoring policies track how data is accessed over time and alert you to unusual or risky activity, so you can respond before it becomes an incident.',
+  },
+  authentication: {
+    term: 'Authentication',
+    body: 'TrustLogix connects using secure authentication — key-pair, OAuth or basic credentials. Key-pair auth uses an encrypted private key and passphrase, and is the recommended method for Snowflake.',
+  },
+  platforms: {
+    term: 'Supported platforms',
+    body: 'TrustLogix supports the major data platforms — Snowflake, Databricks, AWS (Redshift, S3, Glue), Azure, BigQuery and Power BI — so you can govern access consistently across your whole stack.',
+  },
+  prerequisites: {
+    term: 'Prerequisites',
+    body: 'Before connecting, you need network access to your platform and a service account that can read metadata and grants. The Prerequisites step gives you a setup script that creates exactly what TrustLogix needs.',
+  },
+  connect: {
+    term: 'Connecting a data source',
+    body: 'To connect a source, click Register Data Source, pick your platform, run the setup script in the Prerequisites step, then provide the connection and authentication details. I can walk you through it as a few quick missions.',
+    tour: true,
+  },
+}
+
+// Maps a free-text question to the most relevant topic. Ordered most-specific
+// first so narrow matches win over the broad "data source" catch-all.
+function resolveTopic(query: string): AgentTopic {
+  const q = query.toLowerCase()
+  if (/sprawl/.test(q)) return 'data-sprawl'
+  if (/access analyz|analyzer|least privilege|over.?privileg|who can access/.test(q)) return 'access-analyzer'
+  if (/prerequisit|firewall|network|service account|setup script/.test(q)) return 'prerequisites'
+  if (/platform|snowflake|databricks|redshift|bigquery|power ?bi/.test(q)) return 'platforms'
+  if (/auth|key.?pair|oauth|credential|passphrase|private key/.test(q)) return 'authentication'
+  if (/monitor/.test(q)) return 'monitoring'
+  if (/polic/.test(q)) return 'policies'
+  if (/risk/.test(q)) return 'data-risk'
+  if (/register|connect|onboard|add (a |an |new )*(data )?source/.test(q)) return 'connect'
+  if (/data\s*source/.test(q)) return 'data-sources'
+  return 'generic'
+}
+
+// Renders `text` with the first occurrence of `term` highlighted in brand color.
+function highlightTerm(text: string, term: string) {
+  const idx = text.toLowerCase().indexOf(term.toLowerCase())
+  if (idx === -1) return text
+  return (
+    <>
+      {text.slice(0, idx)}
+      <span className="font-semibold text-[#00A8CF]">{text.slice(idx, idx + term.length)}</span>
+      {text.slice(idx + term.length)}
+    </>
+  )
+}
+
 function AgentAnswer({
   topic,
   onStartTour,
   onAsk,
   onOpenVideo,
 }: {
-  topic: 'data-sources' | 'generic'
+  topic: AgentTopic
   onStartTour: () => void
   onAsk: (q: string) => void
   onOpenVideo: () => void
 }) {
+  const response = topic !== 'data-sources' && topic !== 'generic' ? AGENT_RESPONSES[topic] : null
+
   return (
     <div className="rounded-2xl border border-[#E4E7EB] bg-white p-4">
       <div className="flex items-center gap-2">
@@ -923,18 +1012,57 @@ function AgentAnswer({
             </button>
           </div>
         </>
+      ) : response ? (
+        <>
+          <p className="mt-3 text-[13px] leading-[1.7] text-[#617085]">
+            {highlightTerm(response.body, response.term)}
+          </p>
+          {response.tour && (
+            <div className="mt-4 flex items-center gap-2.5">
+              <button
+                type="button"
+                onClick={onStartTour}
+                className="flex-1 rounded-lg bg-[#00A8CF] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-colors hover:bg-[#66CAE3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
+              >
+                Start Data Sources Tour
+              </button>
+              <button
+                type="button"
+                onClick={onOpenVideo}
+                className="rounded-lg border border-[#E4E7EB] bg-white px-4 py-2.5 text-[13px] font-semibold text-[#617085] transition-colors hover:border-[#00A8CF] hover:text-[#00A8CF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-2"
+              >
+                Watch Video
+              </button>
+            </div>
+          )}
+        </>
       ) : (
-        <p className="mt-3 text-[13px] leading-[1.7] text-[#617085]">
-          I can help with that. Try asking about your{' '}
-          <button
-            type="button"
-            onClick={() => onAsk('What is a data source?')}
-            className="font-semibold text-[#00A8CF] hover:underline"
-          >
-            data sources
-          </button>
-          , policies, or data risks.
-        </p>
+        <>
+          <p className="mt-3 text-[13px] leading-[1.7] text-[#617085]">
+            I'm your <span className="font-semibold text-[#00A8CF]">Guardian Agent</span> — I help
+            you understand how TrustLogix discovers sensitive data, analyzes who can access it, and
+            enforces least-privilege policies across your connected sources. I don't have a specific
+            answer for that one, but here are some things I can explain:
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[
+              'What is a data source?',
+              'What is data sprawl?',
+              'Explain the Access Analyzer',
+              'How do access policies work?',
+              'What is data risk?',
+            ].map((q) => (
+              <button
+                key={q}
+                type="button"
+                onClick={() => onAsk(q)}
+                className="rounded-full border border-[#E4E7EB] bg-white px-3 py-1.5 text-[12px] font-medium text-[#617085] transition-colors hover:border-[#CCEEF4] hover:bg-[#F5FCFE] hover:text-[#00A8CF]"
+              >
+                {q}
+              </button>
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
