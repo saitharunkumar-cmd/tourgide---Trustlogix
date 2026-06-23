@@ -8,34 +8,39 @@ type DatasourceCardProps = {
   onSelect: () => void
 }
 
-export default function DatasourceCard({
-  name,
-  logo,
-  badge,
-  selected,
-  onSelect,
-}: DatasourceCardProps) {
+export default function DatasourceCard({ name, logo, selected, onSelect }: DatasourceCardProps) {
   return (
     <button
       type="button"
       onClick={onSelect}
       aria-pressed={selected}
       className={[
-        'group relative flex h-[120px] w-full flex-col items-center justify-center gap-3 rounded-[5px] border bg-white',
+        'relative flex h-[120px] w-full flex-col items-center justify-center gap-[12px] rounded-[5px] border bg-white p-[1px]',
         'transition-all duration-200 ease-out',
-        'focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00A8CF] focus-visible:outline-offset-2',
         selected
-          ? 'border-brand-500 ring-4 ring-brand-100'
-          : 'border-tlx-border hover:border-brand-200 hover:shadow-md',
+          ? 'border-[2px] border-[#00A8CF]'
+          : 'border-[#E4E7EB] hover:border-[#20293A] hover:shadow-[0_2px_4px_rgba(0,0,0,0.06)]',
       ].join(' ')}
     >
-      <span className="flex h-12 w-12 items-center justify-center">{logo}</span>
-      <span className="text-sm font-semibold text-tlx-text">{name}</span>
-      {badge && (
-        <span className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-medium text-brand-600">
-          {badge}
+      {selected && (
+        <span
+          aria-hidden="true"
+          className="absolute -right-[6px] -top-[6px] flex h-4 w-4 items-center justify-center rounded-full bg-[#00A8CF]"
+        >
+          <svg viewBox="0 0 10 10" className="h-2.5 w-2.5" fill="none" stroke="white" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1.5 5 4 7.5 8.5 2.5" />
+          </svg>
         </span>
       )}
+      <span className="flex h-[48px] w-[48px] items-center justify-center">
+        <span className="flex h-[44px] w-[44px] items-center justify-center [&>svg]:h-[44px] [&>svg]:w-[44px]">
+          {logo}
+        </span>
+      </span>
+      <span className="font-['Poppins',sans-serif] text-center text-[14px] font-semibold leading-[20px] text-[#20293A]">
+        {name}
+      </span>
     </button>
   )
 }

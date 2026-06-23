@@ -102,7 +102,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Poppins', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Objectivity', 'Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         'tlx-xs': ['10px', { lineHeight: '14px' }],

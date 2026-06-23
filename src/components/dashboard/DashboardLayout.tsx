@@ -7,12 +7,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-white">
-      <Sidebar collapsed={collapsed} />
+      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed((o) => !o)} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <TopBar collapsed={collapsed} onToggleSidebar={() => setCollapsed((o) => !o)} />
-        <main className="flex-1 overflow-y-auto bg-tlx-canvas px-6 py-6">
-          <div className="mx-auto max-w-[1400px]">{children}</div>
-        </main>
+        <TopBar />
+        <main className="flex-1 overflow-y-auto bg-[#FCFCFF]">{children}</main>
       </div>
     </div>
   )

@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * Objectivity (Degarism). Declared explicitly with the UPRIGHT weight files —
+ * the cdnfonts aggregate stylesheet declares upright + slanted under identical
+ * descriptors, so the slanted variant wins. These rules avoid that. Weight 600
+ * (font-semibold) resolves to 700 via the CSS font-matching algorithm.
+ */
+@font-face {
+  font-family: 'Objectivity';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('https://fonts.cdnfonts.com/s/18151/Objectivity-Regular.woff') format('woff');
+}
+@font-face {
+  font-family: 'Objectivity';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('https://fonts.cdnfonts.com/s/18151/Objectivity-Medium.woff') format('woff');
+}
+@font-face {
+  font-family: 'Objectivity';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('https://fonts.cdnfonts.com/s/18151/Objectivity-Bold.woff') format('woff');
+}
+
 :root {
   /* Surface */
   --tlx-bg-canvas: #FCFCFF;
@@ -104,11 +132,19 @@ body,
 
 body {
   margin: 0;
-  font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+  font-family: 'Objectivity', system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--tlx-text-primary);
   background-color: var(--tlx-bg-canvas);
+}
+
+/* Tighten tracking on larger headings — geometric sans reads cleaner this way */
+h1,
+h2,
+h3 {
+  letter-spacing: -0.01em;
 }
 
 /* Scrollbar styling */
@@ -132,5 +168,43 @@ body {
 
 @keyframes ask-border-spin {
   to { transform: rotate(360deg); }
+}
+
+@keyframes phase-b-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .phase-b-enter { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* FloatingLabelInput — autofill detection keyframes */
+@keyframes onAutoFillStart  { from {} to {} }
+@keyframes onAutoFillCancel { from {} to {} }
+
+.tlx-input:-webkit-autofill {
+  animation-name: onAutoFillStart;
+  animation-duration: 1ms;
+}
+.tlx-input:not(:-webkit-autofill) {
+  animation-name: onAutoFillCancel;
+  animation-duration: 1ms;
+}
+
+/* Force the label to float when the browser autofills the field */
+.tlx-input:-webkit-autofill ~ .tlx-input-label {
+  top: 6px !important;
+  font-size: 11px !important;
+  line-height: 13px !important;
+  padding-left: 4px !important;
+  padding-right: 4px !important;
+  background: #FFFFFF !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tlx-input,
+  .tlx-input-label {
+    transition: none !important;
+  }
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import DatasourceCard from '../components/DatasourceCard'
 import { DATASOURCE_LOGOS } from '../components/datasourceLogos'
+import FloatingLabelInput from '../components/ui/FloatingLabelInput'
 import { useJourneyIntro } from './JourneyIntroContext'
 
 const DATASOURCES = [
@@ -28,24 +29,13 @@ const LOGO_KEY: Record<string, string> = {
 }
 
 const STEPS = [
-  {
-    n: 1,
-    title: 'Select Data Source',
-    sub: 'Choose a data source and name this account',
-  },
-  {
-    n: 2,
-    title: 'Prerequisites',
-    sub: 'Run the setup script in your data source',
-  },
-  {
-    n: 3,
-    title: 'Connection & Authentication',
-    sub: 'Provide the connection details',
-  },
+  { n: 1, title: 'Select Data Source' },
+  { n: 2, title: 'Prerequisites' },
+  { n: 3, title: 'Connection & Authentication' },
 ]
 
 export default function RegisterDataSourceModal() {
+  const STEP_ICONS = [StepNavDbIcon, StepNavChecksIcon, StepNavShieldIcon]
   const {
     phase,
     subStep,
@@ -110,38 +100,27 @@ export default function RegisterDataSourceModal() {
       data-v4-journey
       role="dialog"
       aria-label="Register Data Source"
-      style={{ position: 'fixed', inset: 0, zIndex: 9100 }}
+      style={{ position: 'fixed', inset: 0, zIndex: 9100, boxShadow: '-2px 0 4px rgba(0,0,0,0.10)' }}
       className="flex animate-tour-enter flex-col bg-white"
     >
-      <header className="relative flex shrink-0 items-center justify-between border-b border-tlx-border bg-white px-7 py-5">
-        <div className="flex items-center gap-3">
-          <h2 className="text-lg font-bold tracking-tight text-tlx-text">Register Data Source</h2>
-        </div>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={close}
-            className="flex h-9 w-9 items-center justify-center rounded-[5px] text-tlx-muted transition-all duration-200 hover:bg-danger-50 hover:text-danger-500"
-          >
-            <CloseIcon className="h-[18px] w-[18px]" />
-          </button>
-        </div>
+      {/* ── Header (min-h 64px) ── */}
+      <header className="flex min-h-[64px] shrink-0 items-start justify-between border-b border-[#E4E7EB] bg-white px-[20px] pb-[16.8px] pt-[16px]">
+        <h2 className="text-[18px] font-bold leading-[23.4px] text-[#20293A]">Register Data Source</h2>
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={close}
+          className="flex h-8 w-8 items-center justify-center rounded-[6px] text-[#20293A] transition-colors hover:bg-[rgba(32,41,58,0.06)]"
+        >
+          <CloseIcon className="h-[18px] w-[18px]" />
+        </button>
       </header>
 
-      <div className="grid min-h-0 flex-1 grid-cols-[280px_1fr] gap-0">
-        <aside className="relative overflow-y-auto bg-white px-5 py-7">
-          <span
-            aria-hidden="true"
-            className="absolute left-0 w-[3px] rounded-r-full bg-[#00A8CF] transition-[top] duration-500 ease-out"
-            style={{
-              top: currentPage === 'select' ? 24 : currentPage === 'prerequisites' ? 92 : 160,
-              height: 84,
-            }}
-          />
-          <span aria-hidden="true" className="absolute inset-y-0 right-0 w-px bg-tlx-border" />
-
-          <ul className="space-y-5">
+      {/* ── Body: StepNav + Content ── */}
+      <div className="grid min-h-0 flex-1 grid-cols-[300px_1fr] overflow-hidden">
+        {/* Step Nav (left 300px rail) */}
+        <aside className="overflow-y-auto border-r border-[#E4E7EB] bg-[#FAFBFD] py-[24px]">
+          <ul>
             {STEPS.map((s, idx) => {
               const done =
                 (s.n === 1 && currentPage !== 'select') ||
@@ -150,38 +129,44 @@ export default function RegisterDataSourceModal() {
                 (s.n === 1 && currentPage === 'select') ||
                 (s.n === 2 && currentPage === 'prerequisites') ||
                 (s.n === 3 && currentPage === 'connection')
+              const NavIcon = STEP_ICONS[idx]
               return (
                 <li
                   key={s.n}
-                  className="flex items-start gap-3 animate-stagger-in"
-                  style={{ animationDelay: `${idx * 80}ms` }}
+                  className={[
+                    'relative flex w-full items-center gap-[14px] py-[14px] pr-[20px]',
+                    active ? 'bg-white pl-[17.6px]' : 'pl-[20px]',
+                    !active && !done ? 'opacity-50' : '',
+                  ].join(' ')}
                 >
+                  {active && (
+                    <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[2.4px] bg-[#00A8CF]" />
+                  )}
                   <span
                     className={[
-                      'flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-all duration-500',
-                      done
-                        ? 'bg-[#00A8CF] text-white shadow-sm'
-                        : active
-                          ? 'bg-[#00A8CF] text-white shadow-sm'
-                          : 'border border-tlx-border bg-white text-tlx-muted',
+                      'flex h-[40px] w-[40px] shrink-0 items-center justify-center rounded-[10px]',
+                      done ? 'bg-[#41B57F]' : active ? 'bg-[#00A8CF]' : 'bg-[#E4E7EB]',
                     ].join(' ')}
                   >
-                    {done ? <CheckIcon className="h-4 w-4" /> : s.n}
+                    {done ? (
+                      <CheckIcon className="h-5 w-5 text-white" />
+                    ) : (
+                      <NavIcon className={`h-5 w-5 ${active ? 'text-white' : 'text-[#617085]'}`} />
+                    )}
                   </span>
-                  <div className="pt-0.5">
-                    <p
-                      className={[
-                        'text-[13px] transition-colors duration-300',
-                        active
-                          ? 'font-bold text-tlx-text'
-                          : done
-                            ? 'font-semibold text-[#00A8CF]'
-                            : 'font-semibold text-tlx-secondary',
-                      ].join(' ')}
-                    >
+                  <div className="min-w-0 flex-1">
+                    <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[14px] font-bold leading-[21px] text-[#20293A]">
                       {s.title}
                     </p>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-tlx-muted">{s.sub}</p>
+                    <p className="mt-[1.4px] text-[12px] leading-[18px] text-[#617085]">
+                      {s.n === 1 ? (
+                        <>Choose a data source and name<br />this account</>
+                      ) : s.n === 2 ? (
+                        <>Run the setup script in your data<br />source</>
+                      ) : (
+                        'Provide the connection details'
+                      )}
+                    </p>
                   </div>
                 </li>
               )
@@ -189,12 +174,13 @@ export default function RegisterDataSourceModal() {
           </ul>
         </aside>
 
-        <main className="relative overflow-y-auto bg-tlx-surface px-8 py-7">
-          <div className="flex items-start justify-between gap-4">
-            <div>
+        <main className="relative overflow-y-auto bg-[#FAFBFD] px-[32px] pb-[24px] pt-[28px]">
+          {/* Content header */}
+          <div className="flex w-full items-start justify-between pb-[20px]">
+            <div className="flex flex-col gap-[4px]">
               <h3
                 data-v4-select-heading={currentPage === 'select' ? '' : undefined}
-                className="relative text-lg font-bold text-tlx-text"
+                className="text-[22px] font-bold leading-[33px] text-[#20293A]"
               >
                 {currentPage === 'select'
                   ? 'Select Data Source'
@@ -202,45 +188,44 @@ export default function RegisterDataSourceModal() {
                     ? 'Prerequisites'
                     : 'Connection & Authentication'}
               </h3>
-              <p className="mt-0.5 text-xs font-semibold text-tlx-secondary">
+              <p className="text-[13px] leading-[19.5px] text-[#617085]">
                 Step {currentPage === 'select' ? '1' : currentPage === 'prerequisites' ? '2' : '3'} of 3
               </p>
             </div>
-            <div className="flex items-center gap-1.5 pt-1">
-              <span
-                className={[
-                  'h-1.5 w-6 rounded-full transition-colors',
-                  currentPage !== 'select' ? 'bg-success' : 'bg-brand-500',
-                ].join(' ')}
-              />
-              <span
-                className={[
-                  'h-1.5 w-6 rounded-full transition-colors',
-                  currentPage === 'connection'
-                    ? 'bg-success'
-                    : currentPage === 'prerequisites'
-                      ? 'bg-brand-500'
-                      : 'bg-tlx-border',
-                ].join(' ')}
-              />
-              <span
-                className={[
-                  'h-1.5 w-6 rounded-full transition-colors',
-                  currentPage === 'connection' ? 'bg-brand-500' : 'bg-tlx-border',
-                ].join(' ')}
-              />
+            {/* Progress pills: active = 32px wide, inactive = 20px */}
+            <div className="flex items-center gap-[6px] pt-[4px]">
+              {[1, 2, 3].map((n) => {
+                const stepNum = currentPage === 'select' ? 1 : currentPage === 'prerequisites' ? 2 : 3
+                return (
+                  <span
+                    key={n}
+                    className={[
+                      'h-[6px] rounded-[3px] transition-all duration-300',
+                      stepNum === n ? 'w-[32px]' : 'w-[20px]',
+                      n < stepNum ? 'bg-[#41B57F]' : n === stepNum ? 'bg-[#00A8CF]' : 'bg-[#ABABAB]',
+                    ].join(' ')}
+                  />
+                )
+              })}
             </div>
           </div>
 
           {currentPage === 'select' ? (
-            <div data-v1-register-card className="mt-5 rounded-[10px] border border-tlx-border bg-white p-6 shadow-sm">
-              <div data-v1-platform-grid>
-              <p className="text-sm font-bold text-tlx-text"><span data-v4-select-label>Select Data Source</span></p>
-              <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+            <div
+              data-v1-register-card
+              className="flex w-full flex-col gap-[16px] rounded-[10px] border border-[#E4E7EB] bg-[#FAFBFD] p-[20.8px] shadow-[0_2px_2px_rgba(0,0,0,0.10)]"
+            >
+              {/* Card title */}
+              <p className="text-[16px] font-bold leading-[24px] text-[#20293A]">
+                <span data-v4-select-label>Select Data Source</span>
+              </p>
+
+              {/* Tile grid: 6 cols at lg, 4 at md, 3 at sm, 2 default */}
+              <div data-v1-platform-grid className="grid grid-cols-2 gap-[16px] sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                 {DATASOURCES.map((name) => (
                   <div key={name} data-datasource={name}>
                     <DatasourceCard
-                      name={name}
+                      name={LOGO_KEY[name] ?? name}
                       logo={DATASOURCE_LOGOS[LOGO_KEY[name] ?? name]}
                       selected={selectedDatasource === name}
                       onSelect={() => selectDatasource(name)}
@@ -248,29 +233,19 @@ export default function RegisterDataSourceModal() {
                   </div>
                 ))}
               </div>
-              </div>
 
-              <div className="relative mt-7" data-v4-account-name-section>
-                <input
+              {/* Account Name */}
+              <div data-v4-account-name-section>
+                <FloatingLabelInput
                   id="v4-account-name"
-                  type="text"
+                  label="Account Name"
                   value={accountName}
-                  onChange={(e) => setAccountName(e.target.value)}
-                  placeholder=" "
-                  className={[
-                    'peer block w-full rounded-lg border bg-[#FFFFFF] px-3.5 py-3.5 text-sm text-[#20293A] focus:border-[#2D3A50] focus:outline-none focus:ring-1 focus:ring-[#2D3A50]',
-                    selectedDatasource && !accountName.trim()
-                      ? 'border-brand-500 ring-2 ring-brand-200 animate-ripple-ring'
-                      : 'border-[#2D3A50]',
-                  ].join(' ')}
+                  onChange={setAccountName}
+                  placeholder="e.g. production-snowflake"
+                  highlightBorder={!!(selectedDatasource && !accountName.trim())}
+                  inputClassName={selectedDatasource && !accountName.trim() ? 'animate-ripple-ring' : undefined}
                   data-v4-account-name
                 />
-                <label
-                  htmlFor="v4-account-name"
-                  className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs"
-                >
-                  Account Name<span className="text-danger">*</span>
-                </label>
               </div>
             </div>
           ) : currentPage === 'prerequisites' ? (
@@ -287,36 +262,50 @@ export default function RegisterDataSourceModal() {
         </main>
       </div>
 
-      <footer className={[
-        'relative flex shrink-0 items-center justify-between px-7 py-4',
-        selectVariant === 'v1' ? 'z-[5]' : 'z-20 border-t border-tlx-border bg-white',
-      ].join(' ')}>
+      {/* ── Footer (min-h 68px) ── */}
+      <footer
+        className={[
+          'relative flex min-h-[68px] shrink-0 items-center justify-between border-t border-[#E4E7EB] bg-white px-[20px] pb-[12.8px] pt-[13.6px]',
+          selectVariant === 'v1' ? 'z-[5]' : 'z-20',
+        ].join(' ')}
+      >
         <button
           type="button"
           onClick={onPrevious}
           disabled={currentPage === 'select'}
+          aria-disabled={currentPage === 'select'}
           className={[
-            'inline-flex items-center gap-1.5 rounded-[5px] border px-4 py-2 text-sm font-semibold transition-all duration-200',
+            'flex h-[40px] items-center gap-[5px] rounded-[4px] border px-[10.8px] text-[14px] leading-[20px] text-[#20293A] transition-colors',
             currentPage === 'select'
-              ? 'cursor-not-allowed border-tlx-border bg-white text-tlx-muted'
-              : 'border-[#617085] bg-white text-[#617085] hover:border-[#00A8CF] hover:text-[#00A8CF]',
+              ? 'cursor-not-allowed border-[#E4E7EB] opacity-60'
+              : 'border-[#20293A] hover:bg-[rgba(32,41,58,0.04)]',
           ].join(' ')}
         >
           <ChevronLeftIcon className="h-4 w-4" />
           Previous
         </button>
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-[10.01px]">
+          {currentPage === 'connection' && (
+            <button
+              type="button"
+              onClick={close}
+              className="flex h-[40px] items-center rounded-[5px] border border-[#20293A] px-[10.8px] text-[14px] leading-[20px] text-[#20293A] transition-colors hover:bg-[rgba(32,41,58,0.04)]"
+            >
+              Close
+            </button>
+          )}
           {currentPage === 'connection' ? (
             <button
               type="button"
               data-v4-save
+              data-tour="register-ds-save-button"
               onClick={saveConnection}
               disabled={connField !== 'done'}
               className={[
-                'inline-flex items-center gap-1.5 rounded-[5px] px-6 py-2 text-sm font-semibold transition-all duration-300',
+                'flex items-center gap-[5px] rounded-[5px] px-[10.8px] py-[9.8px] text-[14px] leading-[20px] text-white transition-colors duration-300',
                 connField === 'done'
-                  ? 'bg-[#00A8CF] text-white shadow-sm hover:bg-[#66CAE3]' + (isV2 ? ' animate-ripple-ring' : '')
-                  : 'cursor-not-allowed bg-[#00A8CF] text-white opacity-40 shadow-none',
+                  ? 'bg-[#00A8CF] hover:bg-[#0094B5]' + (isV2 ? ' animate-ripple-ring' : '')
+                  : 'cursor-not-allowed bg-[#99DCEC]',
               ].join(' ')}
             >
               Save
@@ -327,12 +316,12 @@ export default function RegisterDataSourceModal() {
               data-v4-continue
               onClick={onContinue}
               disabled={!continueReady}
+              aria-disabled={!continueReady}
               className={[
-                'inline-flex items-center gap-1.5 rounded-[5px] px-6 py-2 text-sm font-semibold text-white transition-all duration-300',
-                'bg-[#00A8CF] shadow-sm',
-                'hover:bg-[#66CAE3]',
-                'disabled:cursor-not-allowed disabled:opacity-40 disabled:shadow-none',
-                continueReady && isV2 ? 'animate-ripple-ring' : '',
+                'flex items-center gap-[5px] rounded-[5px] px-[9.8px] py-[9.8px] text-[14px] leading-[20px] text-white transition-colors duration-300',
+                continueReady
+                  ? 'bg-[#00A8CF] hover:bg-[#0094B5]' + (continueReady && isV2 ? ' animate-ripple-ring' : '')
+                  : 'cursor-not-allowed bg-[#99DCEC]',
               ].join(' ')}
             >
               Continue
@@ -355,7 +344,7 @@ type OverlayRect = { top: number; left: number; width: number; height: number }
 type V1SubStep =
   | 'select-platform' | 'enter-name' | 'click-continue'
   | 'download' | 'confirm-check'
-  | 'conn-account-id' | 'conn-username' | 'conn-passphrase' | 'conn-private-key' | 'conn-save'
+  | 'conn-account-id' | 'conn-auth-type' | 'conn-username' | 'conn-passphrase' | 'conn-private-key' | 'conn-save'
 
 const V1_GUIDE_MAP: Record<V1SubStep, { title: string; text: string; hint: string }> = {
   'select-platform': {
@@ -388,6 +377,11 @@ const V1_GUIDE_MAP: Record<V1SubStep, { title: string; text: string; hint: strin
     text: 'Enter your Snowflake account identifier — the unique subdomain for your instance (e.g. xy12345). TrustLogix uses this to locate your environment.',
     hint: 'Type your account identifier',
   },
+  'conn-auth-type': {
+    title: 'Choose how to connect',
+    text: 'Pick an Authentication Type. The connection fields you need will appear based on your choice — Key Pair, Basic, or OAuth.',
+    hint: 'Select an authentication type',
+  },
   'conn-username': {
     title: 'Provide User Name',
     text: 'Enter the user name of the TrustLogix service account created during the prerequisite setup.',
@@ -417,9 +411,10 @@ const V1_TARGET_SEL: Record<V1SubStep, string> = {
   'download': '[data-v4-download]',
   'confirm-check': '[data-v4-prereq-checkbox]',
   'conn-account-id': '[data-v4-conn-account-id]',
+  'conn-auth-type': '[data-v4-conn-auth-type]',
   'conn-username': '[data-v4-conn-username] input',
   'conn-passphrase': '[data-v4-conn-passphrase]',
-  'conn-private-key': '[data-v4-upload]',
+  'conn-private-key': '[data-v4-private-key-section]',
   'conn-save': '[data-v4-save]',
 }
 
@@ -432,7 +427,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
   const PAGE_STEPS: Record<string, V1SubStep[]> = {
     select: ['select-platform', 'enter-name', 'click-continue'],
     prerequisites: ['download', 'confirm-check', 'click-continue'],
-    connection: ['conn-account-id', 'conn-username', 'conn-passphrase', 'conn-private-key', 'conn-save'],
+    connection: ['conn-account-id', 'conn-auth-type', 'conn-username', 'conn-passphrase', 'conn-private-key', 'conn-save'],
   }
 
   const steps = PAGE_STEPS[currentPage] ?? PAGE_STEPS.select
@@ -441,7 +436,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
   const sub = steps[Math.min(stepIdx, steps.length - 1)]
   const targetSel = V1_TARGET_SEL[sub]
 
-  const CONN_ORDER: ConnField[] = ['account-id', 'username', 'passphrase', 'private-key', 'done']
+  const CONN_ORDER: ConnField[] = ['account-id', 'auth-type', 'username', 'passphrase', 'private-key', 'done']
   const connIdx = CONN_ORDER.indexOf(connField)
 
   const isCompleted = (() => {
@@ -451,14 +446,25 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
     if (sub === 'download') return downloadClicked
     if (sub === 'confirm-check') return prerequisitesChecked
     if (sub === 'conn-account-id') return connIdx > 0
-    if (sub === 'conn-username') return connIdx > 1
-    if (sub === 'conn-passphrase') return connIdx > 2
-    if (sub === 'conn-private-key') return connIdx > 3
+    if (sub === 'conn-auth-type') return connIdx > 1
+    if (sub === 'conn-username') return connIdx > 2
+    if (sub === 'conn-passphrase') return connIdx > 3
+    if (sub === 'conn-private-key') return connIdx > 4
     return false
   })()
 
   const isActionStep = sub === 'click-continue' || sub === 'conn-save'
   const isLastStep = stepIdx >= steps.length - 1
+
+  // Auto-advance when the private-key step completes (Upload button disappears,
+  // so the user can't click Next — advance programmatically instead)
+  const prevCompletedRef = useRef(false)
+  useEffect(() => {
+    if (sub === 'conn-private-key' && isCompleted && !prevCompletedRef.current && !isLastStep) {
+      setStepIdx(s => s + 1)
+    }
+    prevCompletedRef.current = isCompleted
+  }, [isCompleted, sub, isLastStep])
 
   useLayoutEffect(() => {
     if (selectVariant !== 'v1') { setRect(null); return }
@@ -487,7 +493,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
     active: i === stepIdx,
   }))
 
-  const CW = 300
+  const CW = 340
   const GAP = 14
   const EDGE = 16
   const vh = window.innerHeight
@@ -502,7 +508,11 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
 
   const preferAbove = sub === 'enter-name'
 
-  if (!preferAbove && right >= CW + EDGE) {
+  // Private Key is full-width — place card above the field, aligned to the right
+  if (sub === 'conn-private-key') {
+    cardTop = clamp(rect.top - cardH - GAP, EDGE, vh - cardH)
+    cardLeft = vw - CW - EDGE
+  } else if (!preferAbove && right >= CW + EDGE) {
     cardTop = clamp(rect.top, EDGE, vh - cardH)
     cardLeft = rect.left + rect.width + GAP
   } else if (preferAbove && above >= cardH) {
@@ -538,7 +548,7 @@ function V1RegisterTour({ currentPage, connField }: { currentPage: 'select' | 'p
 
   return (
     <div className="pointer-events-none absolute inset-0" style={{ zIndex: 10 }}>
-      <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
+      <svg className="absolute inset-0 h-full w-full pointer-events-none" aria-hidden="true">
         <defs>
           <mask id="v1-register-hole">
             <rect width="100%" height="100%" fill="white" />
@@ -700,7 +710,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
           const tr = range.getBoundingClientRect()
           const dotX = tr.right + 14
           const dotY = tr.top + tr.height / 2
-          const cardLeft = clamp(dotX + 20, MARGIN, vw - CARD_W - MARGIN)
+          const cardLeft = clamp(dotX + 16, MARGIN, vw - CARD_W - MARGIN)
           const cardTop = clamp(dotY - 36, MARGIN, vh - 320)
           const tailY = clamp(dotY - cardTop, 24, 280)
           setPos({ cardLeft, cardTop, tailX: 0, tailY, tailSide: 'left', target: { x: dotX, y: dotY } })
@@ -711,7 +721,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
           const targetX = r.left + r.width / 2
           const targetY = r.top
           const cardH = ref.current?.offsetHeight ?? 200
-          const cardTop = clamp(r.top - cardH - 14, MARGIN, vh - cardH - MARGIN)
+          const cardTop = clamp(targetY - cardH - 16, MARGIN, vh - cardH - MARGIN)
           const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
           const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
           setPos({ cardLeft, cardTop, tailX, tailSide: 'bottom', target: { x: targetX, y: targetY } })
@@ -722,7 +732,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
           const targetX = r.left + r.width / 2
           const targetY = r.top
           const cardH = ref.current?.offsetHeight ?? 240
-          const cardTop = clamp(r.top - cardH - 24, MARGIN, vh - cardH - MARGIN)
+          const cardTop = clamp(targetY - cardH - 16, MARGIN, vh - cardH - MARGIN)
           const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
           const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
           setPos({ cardLeft, cardTop, tailX, tailSide: 'bottom', target: { x: targetX, y: targetY } })
@@ -737,7 +747,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
         const targetX = r.left + r.width / 2
         const targetY = r.top
         const cardH = ref.current?.offsetHeight ?? 240
-        const cardTop = clamp(r.top - cardH - 24, MARGIN, vh - cardH - MARGIN)
+        const cardTop = clamp(targetY - cardH - 16, MARGIN, vh - cardH - MARGIN)
         const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
         const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
         setPos({ cardLeft, cardTop, tailX, tailSide: 'bottom', target: { x: targetX, y: targetY } })
@@ -752,18 +762,19 @@ function TourCallout({ connField }: { connField: ConnField }) {
             const r = dl.getBoundingClientRect()
             const targetX = r.left + r.width / 2
             const targetY = r.bottom
-            const cardTop = clamp(r.bottom + 18, MARGIN, vh - 280)
+            const cardTop = clamp(targetY + 16, MARGIN, vh - 280)
             const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
             const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
             setPos({ cardLeft, cardTop, tailX, tailSide: 'top', target: { x: targetX, y: targetY } })
           } else if (!prerequisitesChecked) {
             const cb = document.querySelector('[data-v4-prereq-checkbox]') as HTMLElement | null
             if (!cb) return
-            const r = cb.getBoundingClientRect()
-            const targetX = r.left + 28
-            const targetY = r.bottom
-            const cardTop = clamp(r.bottom + 24, MARGIN, vh - 220)
-            const cardLeft = clamp(targetX - 60, MARGIN, vw - CARD_W - MARGIN)
+            const icon = cb.querySelector('span[aria-hidden="true"]') as HTMLElement | null
+            const box = (icon ?? cb).getBoundingClientRect()
+            const targetX = box.left + box.width / 2
+            const targetY = box.bottom + 6
+            const cardTop = clamp(targetY + 10, MARGIN, vh - 220)
+            const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
             const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
             setPos({ cardLeft, cardTop, tailX, tailSide: 'top', target: { x: targetX, y: targetY } })
           } else {
@@ -773,7 +784,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
             const targetX = r.left + r.width / 2
             const targetY = r.top
             const cardH = ref.current?.offsetHeight ?? 200
-            const cardTop = clamp(r.top - cardH - 14, MARGIN, vh - cardH - MARGIN)
+            const cardTop = clamp(targetY - cardH - 16, MARGIN, vh - cardH - MARGIN)
             const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
             const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
             setPos({ cardLeft, cardTop, tailX, tailSide: 'bottom', target: { x: targetX, y: targetY } })
@@ -798,7 +809,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
             const targetX = r.left + r.width / 2
             const targetY = r.top
             const cardH = ref.current?.offsetHeight ?? 200
-            const cardTop = clamp(r.top - cardH - 14, MARGIN, vh - cardH - MARGIN)
+            const cardTop = clamp(targetY - cardH - 16, MARGIN, vh - cardH - MARGIN)
             const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
             const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
             setPos({ cardLeft, cardTop, tailX, tailSide: 'bottom', target: { x: targetX, y: targetY } })
@@ -807,6 +818,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
 
           const selectors: Record<Exclude<ConnField, 'done'>, string> = {
             'account-id': '[data-v4-conn-account-id]',
+            'auth-type': '[data-v4-conn-auth-type]',
             'username': '[data-v4-conn-username]',
             'passphrase': '[data-v4-conn-passphrase]',
             'private-key': '[data-v4-upload]',
@@ -816,23 +828,32 @@ function TourCallout({ connField }: { connField: ConnField }) {
           const r = el.getBoundingClientRect()
 
           if (connField === 'account-id') {
-            const targetX = r.right
-            const targetY = r.top + r.height / 2
-            const cardLeft = clamp(r.right + 14, MARGIN, vw - CARD_W - MARGIN)
+            const inputEl = el.querySelector('input') as HTMLElement | null
+            const ir = (inputEl ?? el).getBoundingClientRect()
+            const targetX = ir.right
+            const targetY = ir.top + ir.height / 2
+            const cardLeft = clamp(ir.right + 10, MARGIN, vw - CARD_W - MARGIN)
             const cardTop = clamp(targetY - 60, MARGIN, vh - 280)
             const tailY = clamp(targetY - cardTop, 28, 240)
             setPos({ cardLeft, cardTop, tailX: 0, tailY, tailSide: 'left', target: { x: targetX, y: targetY } })
+          } else if (connField === 'auth-type') {
+            const targetX = r.left - 10
+            const targetY = r.top + 10
+            const cardLeft = clamp(targetX - CARD_W - 10, MARGIN, vw - CARD_W - MARGIN)
+            const cardTop = clamp(targetY - 60, MARGIN, vh - 280)
+            const tailY = clamp(targetY - cardTop, 28, 240)
+            setPos({ cardLeft, cardTop, tailX: CARD_W, tailY, tailSide: 'right', target: { x: targetX, y: targetY } })
           } else if (connField === 'username') {
             const targetX = r.right
             const targetY = r.top + r.height / 2
-            const cardLeft = clamp(r.right + 14, MARGIN, vw - CARD_W - MARGIN)
+            const cardLeft = clamp(r.right + 10, MARGIN, vw - CARD_W - MARGIN)
             const cardTop = clamp(targetY - 60, MARGIN, vh - 280)
             const tailY = clamp(targetY - cardTop, 28, 240)
             setPos({ cardLeft, cardTop, tailX: 0, tailY, tailSide: 'left', target: { x: targetX, y: targetY } })
           } else if (connField === 'passphrase') {
             const targetX = r.left
             const targetY = r.top + r.height / 2
-            const cardLeft = clamp(targetX - CARD_W - 14, MARGIN, vw - CARD_W - MARGIN)
+            const cardLeft = clamp(targetX - CARD_W - 10, MARGIN, vw - CARD_W - MARGIN)
             const cardTop = clamp(targetY - 60, MARGIN, vh - 280)
             const tailY = clamp(targetY - cardTop, 28, 240)
             setPos({ cardLeft, cardTop, tailX: CARD_W, tailY, tailSide: 'right', target: { x: targetX, y: targetY } })
@@ -840,7 +861,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
             const targetX = r.left + r.width / 2
             const targetY = r.top
             const CARD_H = 220
-            const cardTop = clamp(r.top - CARD_H - 14, MARGIN, vh - CARD_H - MARGIN)
+            const cardTop = clamp(targetY - CARD_H - 36, MARGIN, vh - CARD_H - MARGIN)
             const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, vw - CARD_W - MARGIN)
             const tailX = clamp(targetX - cardLeft, 28, CARD_W - 28)
             setPos({ cardLeft, cardTop, tailX, tailSide: 'bottom', target: { x: targetX, y: targetY } })
@@ -911,6 +932,7 @@ function TourCallout({ connField }: { connField: ConnField }) {
 
   const connTitles: Record<Exclude<ConnField, 'done'>, string> = {
     'account-id': 'Enter Account Identifier',
+    'auth-type': 'Choose how to connect',
     'username': 'Provide Your User Name',
     'passphrase': 'Set Your Passphrase',
     'private-key': 'Upload Private Key',
@@ -1071,6 +1093,16 @@ function TourCallout({ connField }: { connField: ConnField }) {
             <p>TrustLogix uses this to locate and connect to your Snowflake environment securely.</p>
           </div>
         )}
+        {onConnV2 && connField === 'auth-type' && (
+          <div className="mt-3 space-y-2.5 text-[13px] leading-relaxed text-tlx-secondary">
+            <p>Pick an <span className="font-semibold text-tlx-text">Authentication Type</span>. The connection fields you need will appear based on your choice.</p>
+            <ul className="ml-1 space-y-0.5">
+              <li className="flex gap-2"><span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand-500" /><span><span className="font-semibold text-tlx-text">Key Pair</span> — RSA key-pair authentication</span></li>
+              <li className="flex gap-2"><span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand-500" /><span><span className="font-semibold text-tlx-text">Basic</span> — username and password</span></li>
+              <li className="flex gap-2"><span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand-500" /><span><span className="font-semibold text-tlx-text">OAuth</span> — token-based authentication</span></li>
+            </ul>
+          </div>
+        )}
         {onConnV2 && connField === 'username' && (
           <div className="mt-3 space-y-2.5 text-[13px] leading-relaxed text-tlx-secondary">
             <p>Enter the user name of the TrustLogix service account created during the prerequisite setup.</p>
@@ -1111,7 +1143,8 @@ function TourCallout({ connField }: { connField: ConnField }) {
         <div className="mt-4 flex items-center justify-between gap-3 border-t border-tlx-border pt-3">
           {(onConnV2 || connPhaseE) ? (
             <StepBars steps={[
-              { key: 'account-id', done: (['username','passphrase','private-key','done'] as string[]).includes(connField), active: connField === 'account-id' },
+              { key: 'account-id', done: (['auth-type','username','passphrase','private-key','done'] as string[]).includes(connField), active: connField === 'account-id' },
+              { key: 'auth-type', done: (['username','passphrase','private-key','done'] as string[]).includes(connField), active: connField === 'auth-type' },
               { key: 'username', done: (['passphrase','private-key','done'] as string[]).includes(connField), active: connField === 'username' },
               { key: 'passphrase', done: (['private-key','done'] as string[]).includes(connField), active: connField === 'passphrase' },
               { key: 'private-key', done: connField === 'done', active: connField === 'private-key' },
@@ -1173,118 +1206,385 @@ function StepBars({ steps }: { steps: { key: string; done: boolean; active: bool
 
 const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi))
 
-type ConnField = 'account-id' | 'username' | 'passphrase' | 'private-key' | 'done'
+type ConnField = 'account-id' | 'auth-type' | 'username' | 'passphrase' | 'private-key' | 'done'
 
-function ConnectionContent({ isV2, onFieldChange }: { isV2: boolean; onFieldChange?: (f: ConnField) => void }) {
-  const [authType, setAuthType] = useState<'keypair' | 'basic' | 'oauth'>('keypair')
+type AuthType = 'keypair' | 'basic' | 'oauth'
+
+
+function ConnectionContent({ onFieldChange }: { isV2: boolean; onFieldChange?: (f: ConnField) => void }) {
+  const { selectedDatasource } = useJourneyIntro()
   const [accountId, setAccountId] = useState('')
+  const [authType, setAuthType] = useState<AuthType | null>(null)
+
+  // Phase B fields — cleared on auth type switch
   const [userName, setUserName] = useState('')
   const [passphrase, setPassphrase] = useState('')
-  const [keyUploaded, setKeyUploaded] = useState(false)
+  const [password, setPassword] = useState('')
+  const [clientId, setClientId] = useState('')
+  const [clientSecret, setClientSecret] = useState('')
+  const [oauthTokenUrl, setOauthTokenUrl] = useState('')
+  const [privateKeyContent, setPrivateKeyContent] = useState('')
 
-  const activeField: ConnField =
-    !accountId.trim() ? 'account-id'
-    : !userName.trim() ? 'username'
-    : !passphrase.trim() ? 'passphrase'
-    : !keyUploaded ? 'private-key'
-    : 'done'
+  const accountIdValid = /^[A-Za-z0-9_.-]{3,}$/.test(accountId.trim())
+
+  const saveReady = (() => {
+    if (!accountIdValid || !authType) return false
+    if (authType === 'keypair') return !!userName.trim() && !!privateKeyContent.trim()
+    if (authType === 'basic') return !!userName.trim() && !!password.trim()
+    if (authType === 'oauth') return !!clientId.trim() && !!clientSecret.trim() && !!oauthTokenUrl.trim()
+    return false
+  })()
+
+  const activeField: ConnField = saveReady ? 'done'
+    : !accountIdValid ? 'account-id'
+    : !authType ? 'auth-type'
+    : authType === 'keypair'
+      ? (!userName.trim() ? 'username' : !passphrase.trim() ? 'passphrase' : !privateKeyContent.trim() ? 'private-key' : 'done')
+      : authType === 'basic'
+        ? (!userName.trim() ? 'username' : 'passphrase')
+        : (!clientId.trim() ? 'username' : !clientSecret.trim() ? 'passphrase' : 'private-key')
 
   useEffect(() => { onFieldChange?.(activeField) }, [activeField, onFieldChange])
 
-  const pulse = (field: ConnField) =>
-    isV2 && activeField === field
-      ? 'border-brand-500 ring-2 ring-brand-100 animate-ripple-ring'
-      : 'border-tlx-border'
+  const handleAuthTypeChange = (type: AuthType) => {
+    setAuthType(type)
+    setUserName(''); setPassphrase(''); setPassword('')
+    setClientId(''); setClientSecret(''); setOauthTokenUrl('')
+    setPrivateKeyContent('')
+  }
+
+  const isSnowflake = !selectedDatasource || selectedDatasource === 'Snowflake'
+  const suffix = isSnowflake ? '.snowflakecomputing.com' : null
 
   return (
-    <div data-v1-register-card className="mt-5 rounded-2xl border border-tlx-border bg-white p-6 shadow-sm">
-      <p className="text-sm font-bold text-tlx-text">Connection Configuration</p>
-      <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-5 lg:grid-cols-2">
-        <div data-v4-conn-account-id>
-          <div className={['relative rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('account-id')].join(' ')}>
-            <input type="text" id="v4-conn-account-id" value={accountId} onChange={(e) => setAccountId(e.target.value)} placeholder=" " className="peer block w-full rounded-lg border-0 bg-[#FFFFFF] px-3.5 py-3.5 pr-44 text-sm text-[#20293A] focus:outline-none focus:ring-0" />
-            <label htmlFor="v4-conn-account-id" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">Account Identifier</label>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center border-l border-tlx-border px-3 text-xs text-tlx-secondary">.snowflakecomputing.com</span>
-          </div>
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-tlx-secondary">
-            <InfoIcon className="h-3.5 w-3.5 text-brand-500" />
-            How to obtain the Snowflake <a className="font-semibold text-brand-600 underline decoration-brand-300 underline-offset-2">account identifier</a>?
-          </p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-tlx-text">Authentication Type</p>
-          <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
-            {([['keypair', 'Key Pair Authentication'], ['basic', 'Basic Authentication'], ['oauth', 'OAuth Authentication']] as const).map(([id, label]) => (
-              <label key={id} className="flex cursor-pointer items-center gap-2 text-sm text-tlx-text">
-                <input type="radio" name="v4-auth-type" checked={authType === id} onChange={() => setAuthType(id)} className="peer sr-only" />
-                <span aria-hidden="true" className={['flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors', authType === id ? 'border-brand-500' : 'border-tlx-border'].join(' ')}>
-                  {authType === id && <span className="h-2 w-2 rounded-full bg-brand-500" />}
+    <div
+      data-v1-register-card
+      className="flex w-full flex-col gap-[16px] rounded-[10px] border border-[#E4E7EB] bg-[#FAFBFD] p-[20.8px] shadow-[0_2px_2px_rgba(0,0,0,0.10)]"
+    >
+      <p className="text-[16px] font-bold leading-[24px] text-[#20293A]">Connection Configuration</p>
+
+      <div className="grid" style={{ gridTemplateColumns: 'minmax(0,50fr) minmax(0,48fr)', columnGap: 15, rowGap: 20 }}>
+
+        {/* ── Row 1 Col 1 — Account Identifier ── */}
+        <div data-v4-conn-account-id data-tour="register-ds-account-identifier" className="flex flex-col pb-[22.2px]" style={{ overflow: 'visible' }}>
+          <FloatingLabelInput
+            id="v4-conn-account-id"
+            label="Account Identifier"
+            value={accountId}
+            onChange={setAccountId}
+            inputPaddingRight={160}
+            suffix={suffix ? (
+              <span className="pointer-events-none absolute flex items-stretch" style={{ left: 279.7, top: 10, height: 40 }}>
+                <span className="border-l-[0.8px] border-[#20293A]" style={{ marginTop: 5, marginBottom: 5 }} />
+                <span className="flex items-center pl-[5px] text-[14px] font-medium leading-[20px] text-[#617085]">{suffix}</span>
+              </span>
+            ) : undefined}
+            helperText={
+              <>
+                <InfoIcon className="h-[14px] w-[14px] shrink-0 text-[#617085]" />
+                <span className="text-[12px] leading-[16.8px] text-[#617085]">
+                  How to obtain the {selectedDatasource ?? 'Snowflake'}{' '}
+                  <a
+                    href="https://docs.snowflake.com/en/user-guide/admin-account-identifier"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#00A8CF] underline underline-offset-2"
+                  >
+                    account identifier
+                  </a>?
                 </span>
-                {label}
-              </label>
-            ))}
+              </>
+            }
+          />
+        </div>
+
+        {/* ── Row 1 Col 2 — Authentication Type ── */}
+        <div
+          data-v4-conn-auth-type
+          data-tour="register-ds-auth-type-group"
+          className="flex flex-col"
+          style={{ gap: '0.1px' }}
+        >
+          <p className="text-[14px] leading-[21px] text-[#20293A]">Authentication Type</p>
+          <div role="radiogroup" aria-label="Authentication Type" className="relative" style={{ height: 74, width: '100%' }}>
+            {([
+              { id: 'keypair' as AuthType, label: 'Key Pair Authentication', pos: { top: 0, left: 0 } },
+              { id: 'basic' as AuthType, label: 'Basic Authentication', pos: { top: 0, left: 199.89 } },
+              { id: 'oauth' as AuthType, label: 'OAuth Authentication', pos: { top: 45, left: 0 } },
+            ]).map(({ id, label, pos }) => {
+              const selected = authType === id
+              return (
+                <label
+                  key={id}
+                  className="absolute flex cursor-pointer select-none items-center gap-[4px] py-[4px]"
+                  style={{ top: pos.top, left: pos.left }}
+                >
+                  <input
+                    type="radio"
+                    name="v4-auth-type"
+                    value={id}
+                    checked={selected}
+                    onChange={() => handleAuthTypeChange(id)}
+                    className="sr-only peer"
+                  />
+                  <span
+                    role="radio"
+                    aria-checked={selected}
+                    className="flex shrink-0 items-center justify-center rounded-full transition-colors focus-within:outline focus-within:outline-2 focus-within:outline-[#00A8CF] focus-within:outline-offset-2"
+                    style={selected
+                      ? { width: 16.4, height: 16.4, background: '#41B57F', border: '1px solid #41B57F', padding: 1 }
+                      : { width: 16, height: 16, background: '#FFFFFF', border: '1px solid #6B6B6B' }
+                    }
+                  >
+                    {selected && <span className="rounded-full bg-white" style={{ width: 4, height: 4 }} />}
+                  </span>
+                  <span className="text-[14px] leading-[21px] text-[#20293A]">{label}</span>
+                </label>
+              )
+            })}
           </div>
         </div>
-        <div data-v4-conn-username className={['relative self-start rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('username')].join(' ')}>
-          <input type="text" id="v4-conn-username" value={userName} onChange={(e) => setUserName(e.target.value)} placeholder=" " className="peer block w-full rounded-lg border-0 bg-[#FFFFFF] px-3.5 py-3.5 text-sm text-[#20293A] focus:outline-none focus:ring-0" />
-          <label htmlFor="v4-conn-username" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">User Name</label>
-        </div>
-        <div data-v4-conn-passphrase>
-          <div className={['relative rounded-lg border border-[#2D3A50] focus-within:ring-1 focus-within:ring-[#2D3A50]', pulse('passphrase')].join(' ')}>
-            <input type="password" id="v4-conn-passphrase" value={passphrase} onChange={(e) => setPassphrase(e.target.value)} placeholder=" " className="peer block w-full rounded-lg border-0 bg-[#FFFFFF] px-3.5 py-3.5 text-sm text-[#20293A] focus:outline-none focus:ring-0" />
-            <label htmlFor="v4-conn-passphrase" className="pointer-events-none absolute left-3 top-1/2 origin-[0] -translate-y-1/2 bg-white px-1 text-sm text-[#617085] transition-all duration-200 peer-focus:-top-0 peer-focus:-translate-y-1/2 peer-focus:text-xs peer-focus:text-[#617085] peer-[:not(:placeholder-shown)]:-top-0 peer-[:not(:placeholder-shown)]:-translate-y-1/2 peer-[:not(:placeholder-shown)]:text-xs">Passphrase</label>
-          </div>
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-tlx-secondary">
-            <InfoIcon className="h-3.5 w-3.5 text-brand-500" />
-            Passphrase used to encrypt the RSA private key.
-          </p>
-        </div>
-        <div className="lg:col-span-2" data-v4-conn-private-key>
-          <div className={['flex items-center gap-2 rounded-lg border bg-white px-3.5 py-2.5 text-sm', keyUploaded ? 'border-success text-tlx-text' : pulse('private-key'), !keyUploaded ? 'text-tlx-muted' : ''].join(' ')}>
-            <span className="flex-1">{keyUploaded ? 'private_key.pem' : 'Private Key'}</span>
-            <button type="button" data-v4-upload onClick={() => setKeyUploaded(true)} className={['inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700', isV2 && activeField === 'private-key' ? 'animate-ripple-ring rounded-[5px]' : ''].join(' ')}>
-              <UploadIcon className="h-4 w-4" />
-              {keyUploaded ? 'Replace' : 'Upload'}
-            </button>
-          </div>
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-tlx-secondary">
-            <InfoIcon className="h-3.5 w-3.5 text-brand-500" />
-            Learn how to generate your Private and Public Key — see the <a className="font-semibold text-brand-600 underline decoration-brand-300 underline-offset-2">Snowflake key-pair authentication docs</a>.
-          </p>
-        </div>
+
+        {/* ── Rows 2 & 3 — Phase B (conditional, animated) ── */}
+        {authType !== null && (
+          <PhaseBFields
+            key={authType}
+            authType={authType}
+            userName={userName} setUserName={setUserName}
+            passphrase={passphrase} setPassphrase={setPassphrase}
+            password={password} setPassword={setPassword}
+            clientId={clientId} setClientId={setClientId}
+            clientSecret={clientSecret} setClientSecret={setClientSecret}
+            oauthTokenUrl={oauthTokenUrl} setOauthTokenUrl={setOauthTokenUrl}
+            privateKeyContent={privateKeyContent} setPrivateKeyContent={setPrivateKeyContent}
+          />
+        )}
       </div>
     </div>
   )
 }
 
-function PrerequisitesContent({ checked, onCheck, onDownload, downloaded, datasourceLabel }: { checked: boolean; onCheck: (v: boolean) => void; onDownload: () => void; downloaded: boolean; datasourceLabel: string }) {
+type PhaseBProps = {
+  authType: AuthType
+  userName: string; setUserName: (v: string) => void
+  passphrase: string; setPassphrase: (v: string) => void
+  password: string; setPassword: (v: string) => void
+  clientId: string; setClientId: (v: string) => void
+  clientSecret: string; setClientSecret: (v: string) => void
+  oauthTokenUrl: string; setOauthTokenUrl: (v: string) => void
+  privateKeyContent: string; setPrivateKeyContent: (v: string) => void
+}
+
+function PhaseBFields({
+  authType, userName, setUserName, passphrase, setPassphrase,
+  password, setPassword, clientId, setClientId, clientSecret, setClientSecret,
+  oauthTokenUrl, setOauthTokenUrl, privateKeyContent, setPrivateKeyContent,
+}: PhaseBProps) {
+  const enterClass = 'phase-b-enter'
+
+  // Row 2 Col 1 — User Name (keypair/basic) or Client ID (oauth)
+  const col1Label = authType === 'oauth' ? 'Client ID' : 'User Name'
+  const col1Value = authType === 'oauth' ? clientId : userName
+  const col1Set = authType === 'oauth' ? setClientId : setUserName
+  const col1Id = authType === 'oauth' ? 'v4-conn-client-id' : 'v4-conn-username'
+
   return (
-    <div data-v1-register-card className="mt-5 rounded-2xl border border-tlx-border bg-white p-6 shadow-sm">
-      <p className="text-sm font-bold text-tlx-text">Prerequisite Steps</p>
-      <p className="mt-1 text-[13px] text-tlx-secondary">Download and run the {datasourceLabel} setup script before completing the connection step.</p>
-      <div className="mt-6 space-y-5">
-        <div className="flex flex-wrap items-center gap-3 text-[13px] text-tlx-text">
-          <span className="font-semibold text-tlx-secondary">Step 1 –</span>
-          <button type="button" data-v4-download onClick={onDownload} className="relative inline-flex items-center gap-1.5 rounded-[5px] border-2 border-brand-500 bg-brand-500 px-4 py-1.5 text-sm font-semibold text-white ring-4 ring-brand-100 animate-ripple-ring">
-            <DownloadIcon className="h-4 w-4" />
+    <>
+      {/* Row 2, Col 1 */}
+      <div
+        data-v4-conn-username
+        className={enterClass}
+        style={{ animation: 'phase-b-in 200ms ease-out both' }}
+      >
+        <FloatingLabelInput id={col1Id} label={col1Label} value={col1Value} onChange={col1Set} required />
+      </div>
+
+      {/* Row 2, Col 2 */}
+      <div
+        data-v4-conn-passphrase
+        className={enterClass}
+        style={{ animation: 'phase-b-in 200ms ease-out both' }}
+      >
+        {authType === 'keypair' && (
+          <FloatingLabelInput
+            id="v4-conn-passphrase"
+            label="Passphrase"
+            type="password"
+            value={passphrase}
+            onChange={setPassphrase}
+            helperText={
+              <>
+                <InfoIcon className="h-[14px] w-[14px] shrink-0 text-[#617085]" />
+                <span className="text-[12px] leading-[16.8px] text-[#617085]">Passphrase used to encrypt the RSA private key.</span>
+              </>
+            }
+          />
+        )}
+        {authType === 'basic' && (
+          <FloatingLabelInput id="v4-conn-password" label="Password" type="password" value={password} onChange={setPassword} required />
+        )}
+        {authType === 'oauth' && (
+          <FloatingLabelInput id="v4-conn-client-secret" label="Client Secret" type="password" value={clientSecret} onChange={setClientSecret} required />
+        )}
+      </div>
+
+      {/* Row 3, full width — Key Pair: Private Key | OAuth: Token URL | Basic: nothing */}
+      {authType === 'keypair' && (
+        <div
+          data-v4-private-key-section
+          className={[enterClass, 'col-span-2'].join(' ')}
+          style={{ animation: 'phase-b-in 200ms ease-out both', gridColumn: '1 / span 2' }}
+        >
+          <FloatingLabelInput
+            id="v4-conn-private-key"
+            label="Private Key"
+            value={privateKeyContent}
+            onChange={() => {}}
+            readOnly
+            inputPaddingRight={privateKeyContent ? 32 : 80}
+            suffix={
+              privateKeyContent ? (
+                <button
+                  type="button"
+                  onClick={() => setPrivateKeyContent('')}
+                  aria-label="Clear private key"
+                  className="absolute flex items-center justify-center text-[#617085] hover:text-[#20293A] transition-colors"
+                  style={{ top: 10, right: 8.8, height: 40, width: 20 }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  data-v4-upload
+                  onClick={() => setPrivateKeyContent(
+                    '-----BEGIN ENCRYPTED PRIVATE KEY-----\nMIIEpAIBAAKCAQEA2a5KQVBpLMm+FIkXJFoqXpGZ4mVy\nKT7Lz8kN9pRfE2wX1dQhA3bYcM6sJvNuP0qWlOiT5eD\nj3vY6bR8pQmN1sX2tUfW4gHcIoKzA7nBdLe9yMxCuZ0\n-----END ENCRYPTED PRIVATE KEY-----'
+                  )}
+                  className="absolute flex items-center gap-[2px] text-[14px] leading-[21px] text-[#00A8CF] hover:text-[#0094B5]"
+                  style={{ top: 10, right: 10.73, height: 40 }}
+                >
+                  <UploadIcon className="h-4 w-4" />
+                  Upload
+                </button>
+              )
+            }
+            helperText={
+              <>
+                <InfoIcon className="h-[14px] w-[14px] shrink-0 text-[#617085]" />
+                <span className="text-[12px] leading-[16.8px] text-[#617085]">
+                  Learn how to generate your Private and Public Key — see the{' '}
+                  <a
+                    href="https://docs.snowflake.com/en/user-guide/key-pair-auth"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#00A8CF] underline underline-offset-2"
+                  >
+                    Snowflake key-pair authentication docs
+                  </a>.
+                </span>
+              </>
+            }
+          />
+        </div>
+      )}
+      {authType === 'oauth' && (
+        <div
+          className={enterClass}
+          style={{ animation: 'phase-b-in 200ms ease-out both', gridColumn: '1 / span 2' }}
+        >
+          <FloatingLabelInput
+            id="v4-conn-oauth-token-url"
+            label="OAuth Token URL"
+            value={oauthTokenUrl}
+            onChange={setOauthTokenUrl}
+            required
+            helperText={
+              <>
+                <InfoIcon className="h-[14px] w-[14px] shrink-0 text-[#617085]" />
+                <span className="text-[12px] leading-[16.8px] text-[#617085]">The token endpoint URL provided by your identity provider.</span>
+              </>
+            }
+          />
+        </div>
+      )}
+    </>
+  )
+}
+
+function PrerequisitesContent({ checked, onCheck, onDownload, datasourceLabel }: { checked: boolean; onCheck: (v: boolean) => void; onDownload: () => void; downloaded?: boolean; datasourceLabel: string }) {
+  return (
+    <div
+      data-v1-register-card
+      className="flex w-full flex-col rounded-[10px] border border-[#E4E7EB] bg-[#FAFBFD] p-[20.8px] shadow-[0_2px_2px_rgba(0,0,0,0.10)]"
+    >
+      {/* Card title */}
+      <p className="text-[16px] font-bold leading-[24px] text-[#20293A]">Prerequisite Steps</p>
+
+      {/* Intro paragraph */}
+      <p className="pt-[16px] text-[14px] leading-[21px] text-[#20293A]">
+        Download and run the {datasourceLabel} setup script before completing the connection step.
+      </p>
+
+      {/* Steps two-column grid */}
+      <div className="grid pt-[16px]" style={{ gridTemplateColumns: '57.85px 1fr', gap: '20px' }}>
+        {/* Row 1 — Step 1 label */}
+        <span className="flex items-center text-[14px] leading-[21px] text-[#20293A]">Step 1 -</span>
+        {/* Row 1 — Download button + trailing text */}
+        <div className="flex flex-wrap items-center" style={{ gap: '4.32px' }}>
+          <button
+            type="button"
+            data-v4-download
+            onClick={onDownload}
+            className="rounded-[5px] border border-[#00A8CF] bg-[#00A8CF] px-[10.8px] py-[9.6px] text-[14px] leading-[20px] text-white transition-colors hover:bg-[#0094B5]"
+          >
             Download
           </button>
-          <span>and extract the zip file.</span>
+          <span className="text-[14px] leading-[21px] text-[#20293A]">and extract the zip file.</span>
         </div>
-        <div className="text-[13px] leading-relaxed text-tlx-text">
-          <span className="font-semibold text-tlx-secondary">Step 2 –</span>{' '}
-          <span className="font-semibold">Using Snowsight or Classic Console:</span> upload the <code className="rounded bg-tlx-surface px-1 text-[12px] text-tlx-text">.ipynb</code> notebook or paste the contents of <code className="rounded bg-tlx-surface px-1 text-[12px] text-tlx-text">tlx_snowflake_pre_requisite_sql_setup.sql</code> into the UI. Replace <code className="rounded bg-tlx-surface px-1 text-[12px] text-tlx-text">&lt;password / RSA_PUBLIC_KEY&gt;</code> with the actual value and execute the script using the <span className="font-semibold">ACCOUNTADMIN</span> role.
-        </div>
-        <label
-          data-v4-prereq-checkbox
-          className={['flex cursor-pointer items-start gap-2.5 rounded-lg border px-3.5 py-3 text-[13px] text-tlx-text', downloaded && !checked ? 'border-brand-500 bg-brand-50 animate-ripple-ring' : 'border-tlx-border bg-tlx-surface'].join(' ')}
+
+        {/* Row 2 — Step 2 label (align-self: start so it sits at the top of the text block) */}
+        <span className="self-start pt-[2px] text-[14px] leading-[21px] text-[#20293A]">Step 2 -</span>
+        {/* Row 2 — Instructions with Bold spans (no <code> elements) */}
+        <p className="text-[14px] leading-[21px] text-[#20293A]">
+          <span className="font-bold">Using Snowsight or Classic Console :</span> Please upload the .ipynb notebook OR copy the content from the downloaded zip folder file{' '}
+          <span className="font-bold">tlx_snowflake_pre_requisite_sql_setup.sql</span> onto the UI. Replace the{' '}
+          <span className="font-bold">&lt;password&gt;</span>/<span className="font-bold">&lt;RSA_PUBLIC_KEY&gt;</span> value with actual password/public key for the TrustLogix Snowflake user and execute all the SQL statements using the{' '}
+          <span className="font-bold">ACCOUNTADMIN</span> role.
+        </p>
+      </div>
+
+      {/* Confirmation checkbox */}
+      <div className="pt-[16px]">
+      <label
+        data-v4-prereq-checkbox
+        className="flex w-fit cursor-pointer items-center gap-[8px] py-[10px] px-[12px] rounded-[5px] text-[14px] leading-[21px] text-[#20293A]"
+      >
+        <input
+          type="checkbox"
+          checked={checked}
+          onChange={(e) => onCheck(e.target.checked)}
+          className="sr-only peer"
+          id="prereq-checkbox"
+        />
+        <span
+          aria-hidden="true"
+          className={[
+            'relative flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border transition-colors',
+            checked ? 'border-[#00A8CF] bg-[#00A8CF]' : 'border-[#20293A] bg-white',
+            'peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-[#00A8CF] peer-focus-visible:outline-offset-2',
+          ].join(' ')}
         >
-          <input type="checkbox" checked={checked} onChange={(e) => onCheck(e.target.checked)} className="peer sr-only" />
-          <span aria-hidden="true" className={['mt-0.5 flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded border-2 transition-colors', 'peer-focus-visible:ring-2 peer-focus-visible:ring-brand-200', checked ? 'border-brand-500 bg-brand-500 text-white' : 'border-tlx-border bg-white text-transparent'].join(' ')}>
-            <CheckIcon className="h-3 w-3" />
-          </span>
-          <span>I have run the prerequisite script in my {datasourceLabel} account.</span>
-        </label>
+          {checked && (
+            <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="white" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M2 6.5 4.5 9 10 3" />
+            </svg>
+          )}
+        </span>
+        <span>I have run the prerequisite script in my {datasourceLabel} account.</span>
+      </label>
       </div>
     </div>
   )
@@ -1293,6 +1593,31 @@ function PrerequisitesContent({ checked, onCheck, onDownload, downloaded, dataso
 const base = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, viewBox: '0 0 24 24' }
 type P = React.SVGProps<SVGSVGElement>
 
+function StepNavDbIcon(p: P) {
+  return (
+    <svg {...base} {...p}>
+      <ellipse cx="12" cy="5.5" rx="7" ry="2.5" />
+      <path d="M5 5.5v5c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-5" />
+      <path d="M5 10.5v5c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5v-5" />
+    </svg>
+  )
+}
+function StepNavChecksIcon(p: P) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M10 5h9M10 12h9M10 19h9" />
+      <path d="m4 5 1 1 2-2M4 12l1 1 2-2M4 19l1 1 2-2" />
+    </svg>
+  )
+}
+function StepNavShieldIcon(p: P) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M12 2 4 6v6c0 5.5 3.6 10.7 8 12 4.4-1.3 8-6.5 8-12V6L12 2Z" />
+      <path d="m9 12 2 2 4-4" />
+    </svg>
+  )
+}
 function CloseIcon(p: P) { return <svg {...base} {...p}><path d="M6 6l12 12M18 6 6 18" /></svg> }
 function ChevronLeftIcon(p: P) { return <svg {...base} {...p}><path d="m15 6-6 6 6 6" /></svg> }
 function ChevronRightIcon(p: P) { return <svg {...base} {...p}><path d="m9 6 6 6-6 6" /></svg> }

@@ -171,19 +171,17 @@ export default function HelpTrigger({
           willChange: 'transform',
         }}
         className={[
-          'group relative flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14',
-          'bg-brand-500 text-white outline-none select-none',
-          'shadow-lg',
+          'group relative flex h-14 w-14 items-center justify-center rounded-full',
+          'bg-[#00A8CF] text-white outline-none select-none',
+          'shadow-[0_10px_15px_-3px_rgba(0,0,0,0.10),0_4px_6px_-4px_rgba(0,0,0,0.10)]',
           'transition-[transform,box-shadow,background-color] duration-200 ease-out',
           'motion-reduce:transition-none',
-          'hover:bg-[#66CAE3] hover:shadow-lg',
+          'hover:bg-[#0094B5] hover:shadow-[0_12px_20px_-3px_rgba(0,0,0,0.16),0_6px_8px_-4px_rgba(0,0,0,0.12)]',
           'focus-visible:ring-4 focus-visible:ring-brand-200',
-          dragging
-            ? 'scale-110 shadow-2xl'
-            : 'hover:-translate-y-0.5 active:scale-95 active:translate-y-0',
+          dragging ? 'scale-110 shadow-2xl' : 'hover:scale-105 active:scale-95',
         ].join(' ')}
       >
-        <QuestionIcon className="h-6 w-6 transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none sm:h-7 sm:w-7" />
+        <QuestionIcon className="h-7 w-7 transition-transform duration-200 ease-out group-hover:scale-110 motion-reduce:transition-none" />
       </button>
     </div>
   )

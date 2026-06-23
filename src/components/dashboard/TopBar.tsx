@@ -1,55 +1,45 @@
 import { ClockIcon } from '../icons'
-import { ChevronsLeftIcon, BellIcon, HelpIcon } from '../navIcons'
+import { BellIcon, HelpIcon } from '../navIcons'
 
-export default function TopBar({ collapsed, onToggleSidebar }: { collapsed: boolean; onToggleSidebar: () => void }) {
+export default function TopBar() {
   return (
-    <header className="flex h-14 shrink-0 items-center justify-between border-b border-tlx-border bg-white px-5">
+    <header className="flex h-16 shrink-0 items-center justify-end border-b border-[#E4E7EB] bg-white pr-[50px]">
+      {/* UTC pill */}
       <button
         type="button"
-        onClick={onToggleSidebar}
-        aria-label="Toggle sidebar"
-        className="flex h-8 w-8 items-center justify-center rounded-[5px] border border-tlx-border text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
+        className="flex items-center gap-[5px] rounded-[3px] border border-transparent px-[10.8px] py-[6.8px] transition-colors hover:border-[#E4E7EB] hover:bg-[#F3F4F6]"
       >
-        <ChevronsLeftIcon
-          className={[
-            'h-4.5 w-4.5 transition-transform duration-300',
-            collapsed ? 'rotate-180' : '',
-          ].join(' ')}
-        />
+        <ClockIcon className="h-6 w-6 text-[#20293A]" />
+        <span className="text-[14px] leading-none text-[#20293A]">UTC</span>
       </button>
 
-      <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1.5 text-[13px] font-medium text-grey-300">
-          <ClockIcon className="h-4 w-4" />
-          UTC
-        </div>
+      {/* Notifications */}
+      <button
+        type="button"
+        aria-label="Notifications"
+        className="ml-[10px] flex h-9 w-9 items-center justify-center rounded-[5px] text-[#20293A] transition-colors hover:bg-[#F3F4F6]"
+      >
+        <BellIcon className="h-6 w-6" />
+      </button>
 
-        <button
-          type="button"
-          aria-label="Notifications"
-          className="relative flex h-8 w-8 items-center justify-center rounded-[5px] text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
-        >
-          <BellIcon className="h-[18px] w-[18px]" />
-          <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full border-2 border-white bg-danger" />
-        </button>
+      {/* Help / Info */}
+      <button
+        type="button"
+        aria-label="Help"
+        onClick={() => {
+          window.dispatchEvent(new CustomEvent('tlx:open-help-drawer'))
+        }}
+        className="mx-5 flex h-9 w-9 items-center justify-center rounded-[5px] text-[#20293A] transition-colors hover:bg-[#F3F4F6]"
+      >
+        <HelpIcon className="h-5 w-5" />
+      </button>
 
-        <button
-          type="button"
-          aria-label="Help"
-          onClick={() => {
-            window.dispatchEvent(new CustomEvent('tlx:open-help-drawer'))
-          }}
-          className="flex h-8 w-8 items-center justify-center rounded-[5px] text-grey-200 transition-colors hover:bg-neutral-100 hover:text-tlx-text"
-        >
-          <HelpIcon className="h-[18px] w-[18px]" />
-        </button>
-
-        <div className="flex items-center gap-2 rounded-full border border-tlx-border py-1 pl-3.5 pr-1">
-          <span className="text-[13px] font-semibold text-tlx-text">GigBank</span>
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-500 text-xs font-semibold text-white">
-            P
-          </span>
-        </div>
+      {/* Account pill */}
+      <div className="flex items-center gap-[10px] rounded-[50px] border border-[#20293A] py-[5.8px] pl-[15.8px] pr-[5.8px]">
+        <span className="text-[14px] font-bold leading-none text-[#20293A]">GigBank</span>
+        <span className="flex h-[34px] w-[34px] items-center justify-center rounded-full bg-[#00A8CF] text-[14px] font-medium leading-none text-white">
+          P
+        </span>
       </div>
     </header>
   )

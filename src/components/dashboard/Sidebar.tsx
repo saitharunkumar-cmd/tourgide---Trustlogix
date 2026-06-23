@@ -12,6 +12,7 @@ import {
   IntegrationsIcon,
   AttributeIcon,
   AuthShieldIcon,
+  ChevronsLeftIcon,
 } from '../navIcons'
 
 type Icon = ComponentType<SVGProps<SVGSVGElement>>
@@ -59,31 +60,54 @@ const NAV: NavGroup[] = [
   },
 ]
 
-export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
+export default function Sidebar({
+  collapsed = false,
+  onToggle,
+}: {
+  collapsed?: boolean
+  onToggle?: () => void
+}) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
 
   return (
     <aside
       className={[
-        'flex h-screen shrink-0 flex-col border-r border-tlx-border bg-white transition-[width] duration-300 ease-out',
-        collapsed ? 'w-[72px]' : 'w-[232px]',
+        'relative flex h-screen shrink-0 flex-col border-r border-tlx-border bg-white transition-[width] duration-300 ease-out',
+        collapsed ? 'w-[72px]' : 'w-[232px] min-[1440px]:w-[270px]',
       ].join(' ')}
     >
-      <div className={collapsed ? 'flex justify-center px-2 py-5' : 'px-5 py-5'}>
+      {/* Collapse handle — overhangs the sidebar's right edge */}
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label="Toggle sidebar"
+        className="absolute top-4 -right-3 z-20 flex h-7 w-7 items-center justify-center rounded-[5px] border border-tlx-border bg-white text-[#617085] shadow-sm transition-colors hover:bg-neutral-100 hover:text-[#20293A]"
+      >
+        <ChevronsLeftIcon
+          className={['h-4 w-4 transition-transform duration-300', collapsed ? 'rotate-180' : ''].join(' ')}
+        />
+      </button>
+      <div
+        className={[
+          'flex min-h-[64px] items-center py-[17px]',
+          collapsed ? 'justify-center px-2' : 'px-3',
+        ].join(' ')}
+      >
         {collapsed ? <LogoIcon /> : <Logo />}
       </div>
 
-      <nav className={['flex-1 overflow-y-auto pb-6', collapsed ? 'px-2' : 'px-3'].join(' ')}>
+      <nav className={['flex-1 space-y-1 overflow-y-auto py-1', collapsed ? 'px-2' : 'px-2'].join(' ')}>
         {NAV.map((group) => (
-          <div key={group.group} className="mt-5 first:mt-1">
-            {!collapsed && (
-              <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-grey-200">
+          <div key={group.group}>
+            {!collapsed ? (
+              <p className="px-4 pb-1.5 pt-4 text-[12px] font-medium uppercase leading-[12px] tracking-[0.5px] text-[#617085]">
                 {group.group}
               </p>
+            ) : (
+              <div className="mx-auto my-1.5 h-px w-8 bg-tlx-border" />
             )}
-            {collapsed && <div className="mx-auto mb-1.5 h-px w-8 bg-tlx-border" />}
-            <ul className={['space-y-0.5', collapsed ? 'mt-0' : 'mt-1.5'].join(' ')}>
+            <ul className="space-y-0.5">
               {group.items.map((item) => {
                 const active = item.path ? pathname === item.path : false
                 return (
@@ -94,18 +118,20 @@ export default function Sidebar({ collapsed = false }: { collapsed?: boolean }) 
                       aria-current={active ? 'page' : undefined}
                       title={collapsed ? item.label : undefined}
                       className={[
-                        'flex w-full items-center rounded-[5px] transition-colors',
+                        'flex w-full items-center rounded-[6px] transition-colors',
                         collapsed
                           ? 'justify-center px-0 py-2.5'
-                          : 'gap-3 px-3 py-2 text-left text-[13px] font-medium',
+                          : 'gap-3 px-4 py-2 text-left text-[14px] font-medium leading-[21px]',
                         active
-                          ? 'bg-brand-50 text-brand-500'
-                          : 'text-grey-300 hover:bg-neutral-100 hover:text-tlx-text',
+                          ? 'bg-[#E8F7FB] text-[#00A8CF]'
+                          : 'text-[#20293A] hover:bg-[rgba(32,41,58,0.04)]',
                       ].join(' ')}
                     >
-                      <item.icon
-                        className={`h-[18px] w-[18px] shrink-0 ${active ? 'text-brand-500' : 'text-grey-200'}`}
-                      />
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center">
+                        <item.icon
+                          className={`h-5 w-5 ${active ? 'text-[#00A8CF]' : 'text-[#20293A]'}`}
+                        />
+                      </span>
                       {!collapsed && <span className="truncate">{item.label}</span>}
                     </button>
                   </li>

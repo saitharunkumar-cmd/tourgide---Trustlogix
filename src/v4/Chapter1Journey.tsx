@@ -445,7 +445,7 @@ function Chapter2IntroCard() {
         const targetX = r.left + r.width / 2
         const targetY = r.top + r.height / 2
         const cardLeft = clamp(targetX - CARD_W / 2, MARGIN, window.innerWidth - CARD_W - MARGIN)
-        const cardTop = clamp(r.bottom + 16, MARGIN, vh - 260)
+        const cardTop = clamp(targetY + 6 + 20, MARGIN, vh - 260)
         const tailX = clamp(targetX - cardLeft, 40, CARD_W - 40)
         setAnchor({ cardLeft, cardTop, tailY: tailX, targetX, targetY })
       }
